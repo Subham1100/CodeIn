@@ -10,7 +10,7 @@ const HomePage = () => {
         <h1 className="text-title font-bold font-sans  ">Whiteboard</h1>
 
         <img
-          src="../../public/images/hero_image.png"
+          src="../../public/images/hero_image.jpg"
           alt="Image"
           className="w-[800px] h-[450px] object-cover rounded-3xl "
         />
