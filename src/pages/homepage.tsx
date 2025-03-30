@@ -10,7 +10,7 @@ const HomePage = () => {
         <div id="hero_description">
           <p id="hero_description_title"></p>
           <p id="hero_description_text"></p>
-          <button id="hero_button_cta">Get Started</button>
+          <button id="hero_button_cta">Get Startedt</button>
         </div>
       </section>
       <section id="contact">
