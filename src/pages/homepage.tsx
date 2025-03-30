@@ -1,16 +1,42 @@
-import React from "react";
 import Feature from "../components/feature";
 
 const HomePage = () => {
   return (
-    <div>
-      <section id="hero">
-        <div id="title">Whiteboard</div>
-        <div id="hero_image"></div>
-        <div id="hero_description">
-          <p id="hero_description_title"></p>
-          <p id="hero_description_text"></p>
-          <button id="hero_button_cta">Get Startedt</button>
+    <div id="main-container" className="bg-[#FFF7E3]">
+      <section
+        id="hero"
+        className="p-[75px] flex flex-col center items-center gap-[50px]  "
+      >
+        <h1 className="text-title font-bold font-sans  ">Whiteboard</h1>
+
+        <img
+          src="../../public/images/hero_image.avif"
+          alt="Image"
+          className="w-[800px] h-[450px] object-cover rounded-3xl "
+        />
+        <div
+          id="hero_description"
+          className="flex flex-col items-center justify-center gap-[20px] w-[800px]"
+        >
+          <p
+            id="hero_description_title"
+            className="text-2xl text-[#888888] font-bold font-Merriweather "
+          >
+            "Collaborate Seamlessly, Draw Ideas Together!"
+          </p>
+          <p
+            id="hero_description_text"
+            className="text-2xl text-[#888888] font-Merriweather italic text-center "
+          >
+            Whiteboard lets you and your team brainstorm, sketch, and create in
+            real-time — anytime,anywhere.
+          </p>
+          <button
+            id="hero_button_cta"
+            className="bg-black p-2 rounded-xl shadow-black shadow-md"
+          >
+            <p className="text-button text-white font-sans">Get Started</p>
+          </button>
         </div>
       </section>
       <section id="contact">
@@ -51,13 +77,14 @@ const HomePage = () => {
           flip={false}
         />
       </section>
+
       <section id="footer">
         <div id="footer_cta">
           <p id="footer_cta_title">Sign up today</p>
           <button id="footer_cta_button">Get started</button>
         </div>
         <div id="copyright_info">
-          <div id="copyright_tag">© 2025 Whiteboard. All rights reserved.</div>
+          <div id="copyright_tag">© 2025 Whiteboard. All rights reserved. </div>
           <div id="footer_links">
             <button id="footer_links_button">Instagram</button>
             <button id="footer_links_button">Email</button>

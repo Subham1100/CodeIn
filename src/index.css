@@ -1,1 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Lobster+Two:ital,wght@0,400;0,700;1,400;1,700&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Montserrat:wght@100..900&display=swap");
+
 @import "tailwindcss";
+@theme {
+  --text-button: 14px;
+  --text-title: 4.5rem;
+}
+body {
+  font-family: "Merriweather", serif;
+}
