@@ -1,18 +1,20 @@
 import "./css/feature.css";
 type FeatureProps = {
-  title: string;
-  description: string;
-  image_src: string;
-  flip: boolean;
-  link: string;
+  title?: string;
+  description?: React.ReactNode;
+  image_src?: string;
+  flip?: boolean;
+  link?: string;
+  button_text?: string;
 };
 
 const Feature = ({
-  title,
-  description,
-  image_src,
-  flip,
-  link,
+  title = "Default Title",
+  description = "Default description goes here.",
+  image_src = "/default-image.jpg", // Path to a default image
+  flip = false,
+  link = "#",
+  button_text = "button",
 }: FeatureProps) => {
   if (flip) {
     return (
@@ -40,12 +42,14 @@ const Feature = ({
           >
             {description}
           </p>
-          <button
-            onClick={() => (window.location.href = link)}
-            className="bg-black rounded-xl text-white p-2 text-tiny w-[100px]"
-          >
-            Read more
-          </button>
+          {button_text !== "button" && (
+            <button
+              onClick={() => (window.location.href = link)}
+              className="bg-black rounded-xl text-white p-2 w-[100px] "
+            >
+              {button_text}
+            </button>
+          )}
         </div>
       </div>
     );
@@ -65,16 +69,18 @@ const Feature = ({
           >
             {description}
           </p>
-          <button
-            onClick={() => (window.location.href = link)}
-            className="bg-black rounded-xl text-white p-2 w-[100px] "
-          >
-            Read more
-          </button>
+          {button_text !== "button" && (
+            <button
+              onClick={() => (window.location.href = link)}
+              className="bg-black rounded-xl text-white p-2 w-[100px] "
+            >
+              {button_text}
+            </button>
+          )}
         </div>
         <div
           id="first_section"
-          className="w-[80%] bg-amber-50 flex items-center justify-center"
+          className="w-[80%] flex items-center justify-center"
         >
           <img
             id="feature_image"

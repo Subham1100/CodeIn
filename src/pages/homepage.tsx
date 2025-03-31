@@ -1,7 +1,14 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import Feature from "../components/feature";
 import "./css/homepage.css";
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const goToRooms = () => {
+    navigate("/rooms");
+  };
   return (
     <div id="main-container" className="bg-[#FFF7E3] ">
       <section
@@ -36,6 +43,7 @@ const HomePage = () => {
           <button
             id="hero_button_cta"
             className="bg-black p-2 rounded-xl shadow-black shadow-md"
+            onClick={goToRooms}
           >
             <p className="text-button text-white font-sans">Get Started</p>
           </button>
@@ -78,6 +86,7 @@ const HomePage = () => {
           image_src="../../public/images/ai-suggestions.avif"
           link=""
           flip={true}
+          button_text="Read me"
         />
         <Feature
           title="Real-Time Collaborations"
@@ -85,6 +94,7 @@ const HomePage = () => {
           image_src="../../public//images/collaboration.avif"
           flip={false}
           link=""
+          button_text="Read me"
         />
       </section>
 
