@@ -13,21 +13,22 @@ const HomePage = () => {
         <img
           src="../../public/images/hero_image.jpg"
           alt="Image"
-          className="w-[800px] h-[450px] object-cover rounded-3xl animate-flip-vertical"
+          id="hero_image"
+          className=" object-cover rounded-3xl animate-flip-vertical"
         />
         <div
           id="hero_description"
-          className="flex flex-col items-center justify-center gap-[20px] w-[800px]"
+          className="flex flex-col items-center justify-center gap-[30px]"
         >
           <p
             id="hero_description_title"
-            className="text-2xl text-[#888888] font-bold font-Merriweather "
+            className="text-2xl md:text-xl text-[#888888] font-bold font-Merriweather text-center"
           >
             "Collaborate Seamlessly, Draw Ideas Together!"
           </p>
           <p
             id="hero_description_text"
-            className="text-2xl text-[#888888] font-Merriweather italic text-center "
+            className="text-2xl md:text-xl text-[#888888] font-Merriweather italic text-center "
           >
             Whiteboard lets you and your team brainstorm, sketch, and create in
             real-time — anytime,anywhere.
@@ -40,11 +41,11 @@ const HomePage = () => {
           </button>
         </div>
       </section>
-      <section
-        id="contact"
-        className="flex justify-center px-[100px] py-[100px]"
-      >
-        <div id="social_links" className="flex gap-[50px] px-[100px] ">
+      <section id="contact" className="flex justify-center  py-[100px]">
+        <div
+          id="social_links"
+          className="flex flex-wrap gap-[50px] px-[100px] w-[full] items-center justify-center "
+        >
           <img
             src="../../public/images/twitter.png"
             alt="twitter"
@@ -67,7 +68,10 @@ const HomePage = () => {
           />
         </div>
       </section>
-      <section id="features" className="px-[100px] py-[50px] ">
+      <section
+        id="features"
+        className="px-[100px] py-[50px] flex flex-col gap-[50px] "
+      >
         <Feature
           title="AI-Powered Suggestions"
           description="Leverage AI to suggest shapes, diagrams, or text based on user sketches, enhancing brainstorming sessions."
@@ -89,8 +93,8 @@ const HomePage = () => {
           id="footer_cta"
           className="h-[330px] flex flex-col items-center justify-center gap-[50px] px-[100px] "
         >
-          <p id="footer_cta_title" className="text-5xl font-bold">
-            Sign up today
+          <p id="footer_cta_title" className="text-6xl font-bold">
+            Sign up today.
           </p>
           <button
             id="footer_cta_button"
