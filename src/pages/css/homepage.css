@@ -1,0 +1,7 @@
+#social_media_icons {
+  @apply h-[64px] w-[64px] rounded-full;
+  cursor: pointer;
+}
+button {
+  cursor: pointer;
+}

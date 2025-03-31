@@ -1,18 +1,19 @@
 import Feature from "../components/feature";
+import "./css/homepage.css";
 
 const HomePage = () => {
   return (
-    <div id="main-container" className="bg-[#FFF7E3]">
+    <div id="main-container" className="bg-[#FFF7E3] ">
       <section
         id="hero"
-        className="p-[75px] flex flex-col center items-center gap-[50px]  "
+        className=" flex flex-col center items-center gap-[50px] animate-slide-in "
       >
-        <h1 className="text-title font-bold font-sans  ">Whiteboard</h1>
+        <h1 className="text-title font-bold font-sans">Whiteboard</h1>
 
         <img
           src="../../public/images/hero_image.jpg"
           alt="Image"
-          className="w-[800px] h-[450px] object-cover rounded-3xl "
+          className="w-[800px] h-[450px] object-cover rounded-3xl animate-flip-vertical"
         />
         <div
           id="hero_description"
@@ -39,8 +40,11 @@ const HomePage = () => {
           </button>
         </div>
       </section>
-      <section id="contact">
-        <div id="social_links">
+      <section
+        id="contact"
+        className="flex justify-center px-[100px] py-[100px]"
+      >
+        <div id="social_links" className="flex gap-[50px] px-[100px] ">
           <img
             src="../../public/images/twitter.png"
             alt="twitter"
@@ -63,31 +67,58 @@ const HomePage = () => {
           />
         </div>
       </section>
-      <section id="features">
+      <section id="features" className="px-[100px] py-[50px] ">
         <Feature
           title="AI-Powered Suggestions"
           description="Leverage AI to suggest shapes, diagrams, or text based on user sketches, enhancing brainstorming sessions."
           image_src="../../public/images/ai-suggestions.avif"
+          link=""
           flip={true}
         />
         <Feature
-          title="Real-Time Collaboration"
+          title="Real-Time Collaborations"
           description="Collaborate with your team in real-time, enabling seamless brainstorming and idea sharing."
           image_src="../../public//images/collaboration.avif"
           flip={false}
+          link=""
         />
       </section>
 
-      <section id="footer">
-        <div id="footer_cta">
-          <p id="footer_cta_title">Sign up today</p>
-          <button id="footer_cta_button">Get started</button>
+      <section id="footer" className="mt-[50px] flex flex-col gap-[50px]">
+        <div
+          id="footer_cta"
+          className="h-[330px] flex flex-col items-center justify-center gap-[50px] px-[100px] "
+        >
+          <p id="footer_cta_title" className="text-5xl font-bold">
+            Sign up today
+          </p>
+          <button
+            id="footer_cta_button"
+            className="bg-black text-white p-2 rounded-xl shadow-lg shadow-black"
+          >
+            Get started
+          </button>
         </div>
-        <div id="copyright_info">
-          <div id="copyright_tag">© 2025 Whiteboard. All rights reserved. </div>
-          <div id="footer_links">
-            <button id="footer_links_button">Instagram</button>
-            <button id="footer_links_button">Email</button>
+        <div
+          id="footer"
+          className="bg-[#222222] h-[100px] flex justify-between gap-2.5 items-center p-[50px]"
+        >
+          <div id="copyright_tag" className="text-[#CCCACA] text-tiny ">
+            © 2025 Whiteboard. All rights reserved.{" "}
+          </div>
+          <div id="footer_links" className="flex gap-2">
+            <button
+              id="footer_links_button"
+              className="text-[#CCCACA] text-tiny"
+            >
+              Instagram
+            </button>
+            <button
+              id="footer_links_button"
+              className="text-[#CCCACA] text-tiny"
+            >
+              Email
+            </button>
           </div>
         </div>
       </section>

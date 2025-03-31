@@ -4,7 +4,40 @@
 @theme {
   --text-button: 14px;
   --text-title: 4.5rem;
+  --text-tiny: 0.8rem;
+  --animate-slide-in: slide-in 1s ease-in-out;
+  --animate-flip-vertical: flip-vertical 1s ease-in-out;
+  --animate-delay: delay 4s ease-in-out;
 }
 body {
   font-family: "Merriweather", serif;
+}
+@keyframes slide-in {
+  0% {
+    transform: translateY(75px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-7px);
+    opacity: 1;
+  }
+}
+
+@keyframes flip-vertical {
+  0% {
+    transform: rotateX(-70deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+@keyframes delay {
+  0% {
+    transform: translateY(300px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
