@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import HomePage from "./pages/homepage";
 import Rooms from "./pages/room";
+import { Whiteboard } from "./pages";
 import "./App.css";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/rooms" element={<Rooms />} />
+        <Route path="/rooms/:roomId" element={<Whiteboard />} />
       </Routes>
     </Router>
   );

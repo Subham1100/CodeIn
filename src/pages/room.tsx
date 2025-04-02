@@ -9,7 +9,7 @@ const room = () => {
   const [placeholderName, setplaceholderName] = useState("Enter Name");
   const [placeholderRoomCode, setplaceholderRoomCode] = useState("Room Code");
   return (
-    <div className="px-[100px] py-[50px] pb-[100px] flex flex-col gap-[50px] animate-flip-vertical animate-slide-in bg-[#C9B98F] ">
+    <div className="px-[100px] py-[50px] pb-[100px] flex flex-col gap-[50px] animate-flip-vertical animate-slide-in bg-[#F0E0B9] ">
       <Feature
         title={"Join Room"}
         image_src="../../public/images/join_room.jpeg"
