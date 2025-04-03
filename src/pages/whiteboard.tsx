@@ -1,5 +1,16 @@
 import React, { useState, useRef, useEffect, MouseEventHandler } from "react";
 import Canvas from "./canvas";
+import { useSocket } from "../hooks/socketContext";
+import { useParams } from "react-router-dom";
+interface DrawElement {
+  type: string;
+  offsetX: number;
+  offsetY: number;
+  path: [number, number][]; // Array of [x, y] points
+  stroke: string;
+  width: number;
+  height: number;
+}
 
 const Whiteboard = () => {
   const [getTool, setTool] = useState<string>("pencil");
@@ -7,15 +18,25 @@ const Whiteboard = () => {
   const [getHistory, setHistory] = useState<DrawElement[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null!);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null!);
-  interface DrawElement {
-    type: string;
-    offsetX: number;
-    offsetY: number;
-    path: [number, number][]; // Array of [x, y] points
-    stroke: string;
-    width: number;
-    height: number;
-  }
+  const { roomId } = useParams();
+
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!roomId || !socket.connected) return;
+    socket.on("userIsJoined", (data) => {
+      console.log(data.user);
+      if (data.success) {
+        console.log("User joined successfully");
+      } else {
+        console.log("Error joining room");
+      }
+    });
+    return () => {
+      socket.off("userIsJoined");
+    };
+  }, [roomId, socket]);
+
   const [getElements, setElements] = useState<DrawElement[]>([]);
   const handleClear = () => {
     const canvas = canvasRef.current;
@@ -24,9 +45,65 @@ const Whiteboard = () => {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
     setElements([]);
+    socket.emit("clearCanvas");
   };
 
+  useEffect(() => {
+    const handleUpdateCanvas = (updatedData: {
+      type: string;
+      element: DrawElement;
+    }) => {
+      if (updatedData.type === "updateCanvas") {
+        setElements((prevElements) => [...prevElements, updatedData.element]);
+      }
+    };
+    const handleUpdateUndoCanvas = (updatedData: {
+      type: string;
+      element: DrawElement;
+    }) => {
+      if (updatedData.type === "undoCanvas") {
+        if (getElements.length === 1) {
+          setHistory((prev) => [...prev, getElements[getElements.length - 1]]);
+          handleClear();
+        } else {
+          // console.log("before slice" + getElements.length);
+          setHistory((prevHistory) => [
+            ...prevHistory,
+            getElements[getElements.length - 1],
+          ]);
+          setElements((prevElement) =>
+            prevElement.slice(0, prevElement.length - 1)
+          );
+        }
+      }
+    };
+    const handleupdateClearCanvas = (updatedData: { type: string }) => {
+      if (updatedData.type === "clearCanvas") {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.clearRect(
+            0,
+            0,
+            canvasRef.current.width,
+            canvasRef.current.height
+          );
+        }
+        setElements([]);
+      }
+    };
+
+    socket.on("updateCanvas", handleUpdateCanvas);
+    socket.on("updateUndoCanvas", handleUpdateUndoCanvas);
+    socket.on("updateClearCanvas", handleupdateClearCanvas);
+
+    return () => {
+      socket.off("updateCanvas", handleUpdateCanvas);
+    };
+  }, [socket]);
+
   const handleUndo: MouseEventHandler<HTMLButtonElement> = () => {
+    if (getElements.length == 0) return;
     if (getElements.length === 1) {
       setHistory((prev) => [...prev, getElements[getElements.length - 1]]);
       handleClear();
@@ -39,16 +116,20 @@ const Whiteboard = () => {
       setElements((prevElement) =>
         prevElement.slice(0, prevElement.length - 1)
       );
-      // console.log("after slice" + getElements.length);
     }
+    socket.emit("undoCanvas", getHistory[getHistory.length - 1]);
   };
 
   const handleRedo = () => {
-    setElements((prevElements) => [
-      ...prevElements,
-      getHistory[getHistory.length - 1],
-    ]);
+    if (getHistory.length === 0) return;
+
+    const lastElement = getHistory[getHistory.length - 1];
+    if (!lastElement) return; // Extra safeguard
+
+    setElements((prevElements) => [...prevElements, lastElement]);
     setHistory((prevHistory) => prevHistory.slice(0, prevHistory.length - 1));
+
+    socket.emit("drawElement", lastElement);
   };
   return (
     <div>
@@ -63,7 +144,6 @@ const Whiteboard = () => {
             id="pencil"
             name="tool"
             value="pencil"
-            checked={getTool === "pencil"}
             defaultChecked
             onChange={(e) => setTool(e.target.value)}
           />

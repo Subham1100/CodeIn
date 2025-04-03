@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import "./css/canvas.css";
 import rough from "roughjs";
+import { useSocket } from "../hooks/socketContext.tsx";
 
 interface DrawElement {
   type: string;
@@ -104,6 +105,25 @@ const Canvas: React.FC<CanvasProps> = ({
       }
     });
   }, [getElements]);
+
+  const socket = useSocket();
+
+  useEffect(() => {
+    const handleUpdateCanvas = (updatedData: {
+      type: string;
+      element: DrawElement;
+    }) => {
+      if (updatedData.type === "updateCanvas") {
+        setElements((prevElements) => [...prevElements, updatedData.element]);
+      }
+    };
+
+    socket.on("updateCanvas", handleUpdateCanvas);
+
+    return () => {
+      socket.off("updateCanvas", handleUpdateCanvas);
+    };
+  }, [socket]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     const { offsetX, offsetY } = e.nativeEvent;
@@ -254,6 +274,9 @@ const Canvas: React.FC<CanvasProps> = ({
     // const { offsetX, offsetY } = e.nativeEvent;
     // console.log(offsetX, offsetY);
     // console.log("Mouse released", e);
+    if (getElements.length === 0) return;
+    const newGetElements = getElements[getElements.length - 1];
+    socket.emit("drawElement", newGetElements);
     setIsDrawing(false);
   };
 

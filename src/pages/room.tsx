@@ -1,13 +1,66 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSocket } from "../hooks/socketContext.tsx";
 
 import Feature from "../components/feature";
 
 const room = () => {
   useEffect(() => {
-    window.scrollTo(0, 0); // Scroll to the top when the component loads
+    window.scrollTo(0, 0);
   }, []);
+
   const [placeholderName, setplaceholderName] = useState("Enter Name");
-  const [placeholderRoomCode, setplaceholderRoomCode] = useState("Room Code");
+  const [placeholderRoomId, setplaceholderRoomId] = useState("Room Code");
+  const roomIds: number[] = [];
+
+  const generateRoomCode = (): number => {
+    const min = 1000;
+    const max = 9999;
+    let RoomId: number;
+
+    do {
+      RoomId = Math.floor(Math.random() * (max - min + 1)) + min;
+    } while (roomIds.includes(RoomId));
+
+    roomIds.push(RoomId);
+    return RoomId;
+  };
+  const generateUuid = (): string => {
+    const randomLetter = String.fromCharCode(
+      97 + Math.floor(Math.random() * 26)
+    ); // 'a' to 'z'
+    const randomNumber = Math.floor(1 + Math.random() * 99999999); // 1 to 100000000
+    return `${randomLetter}${randomNumber}`;
+  };
+  const socket = useSocket();
+  const navigate = useNavigate();
+  const handleCreate = () => {
+    const RoomId = generateRoomCode();
+    const uuid = generateUuid();
+    const roomData = {
+      name: placeholderName,
+      userId: uuid,
+      roomId: RoomId,
+      host: true,
+      presenter: false,
+    };
+    socket.emit("joinRoom", roomData);
+    navigate(`/rooms/${RoomId}`);
+  };
+
+  const handleJoin = () => {
+    const RoomId = placeholderRoomId;
+    const uuid = generateUuid();
+    const roomData = {
+      name: placeholderName,
+      userId: uuid,
+      roomId: RoomId,
+      host: true,
+      presenter: false,
+    };
+    socket.emit("joinRoom", roomData);
+    navigate(`/rooms/${RoomId}`);
+  };
   return (
     <div className="px-[100px] py-[50px] pb-[100px] flex flex-col gap-[50px] animate-flip-vertical animate-slide-in bg-[#F0E0B9] ">
       <Feature
@@ -19,21 +72,40 @@ const room = () => {
               id="name"
               placeholder={placeholderName}
               className="bg-white rounded-2xl p-2 focus:outline-none"
-              onFocus={() => {
-                setplaceholderName("");
+              onChange={(e) => setplaceholderName(e.target.value)}
+              onBlur={() => {
+                if (placeholderName.trim() === "") {
+                  setplaceholderName("Enter Name");
+                }
               }}
-              onBlur={() => setplaceholderName("Enter name")}
+              onFocus={() => {
+                if (placeholderName === "Enter Name") {
+                  setplaceholderName("");
+                }
+              }}
             />
             <input
               id="room_code"
-              placeholder={placeholderRoomCode}
+              placeholder={placeholderRoomId}
               className="bg-white rounded-2xl p-2 focus:outline-none"
-              onFocus={() => {
-                setplaceholderRoomCode("");
+              onChange={(e) => setplaceholderRoomId(e.target.value)}
+              onBlur={() => {
+                if (placeholderRoomId.trim() === "") {
+                  setplaceholderRoomId("Enter Name"); // ✅ Restore text only if empty
+                }
               }}
-              onBlur={() => setplaceholderRoomCode("Room Code")}
+              onFocus={() => {
+                if (placeholderRoomId === "Enter Name") {
+                  setplaceholderRoomId(""); // ✅ Clear only if it was the default text
+                }
+              }}
             />
-            <button className="bg-black text-white rounded-xl p-2">Join</button>
+            <button
+              className="bg-black text-white rounded-xl p-2"
+              onClick={handleJoin}
+            >
+              Join
+            </button>
           </div>
         }
       />
@@ -47,12 +119,22 @@ const room = () => {
               id="name"
               placeholder={placeholderName}
               className="bg-white rounded-2xl p-2 focus:outline-none"
-              onFocus={() => {
-                setplaceholderName("");
+              onChange={(e) => setplaceholderName(e.target.value)}
+              onBlur={() => {
+                if (placeholderName.trim() === "") {
+                  setplaceholderName("Enter Name"); // ✅ Restore text only if empty
+                }
               }}
-              onBlur={() => setplaceholderName("Enter name")}
+              onFocus={() => {
+                if (placeholderName === "Enter Name") {
+                  setplaceholderName(""); // ✅ Clear only if it was the default text
+                }
+              }}
             />
-            <button className="bg-black text-white rounded-xl p-2">
+            <button
+              className="bg-black text-white rounded-xl p-2"
+              onClick={handleCreate}
+            >
               Create
             </button>
           </div>
