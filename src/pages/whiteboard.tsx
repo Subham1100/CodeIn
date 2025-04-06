@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect, MouseEventHandler } from "react";
-import Canvas from "./canvas";
-import { useSocket } from "../hooks/socketContext";
 import { useParams } from "react-router-dom";
+import { useSocket } from "../hooks/socketContext";
+import { logEvent, LogLevel } from "../utils/logger";
+import Canvas from "./canvas";
+
 interface DrawElement {
   type: string;
   offsetX: number;
   offsetY: number;
-  path: [number, number][]; // Array of [x, y] points
+  path: [number, number][];
   stroke: string;
   width: number;
   height: number;
@@ -16,121 +18,225 @@ const Whiteboard = () => {
   const [getTool, setTool] = useState<string>("pencil");
   const [getColor, setColor] = useState<string>("black");
   const [getHistory, setHistory] = useState<DrawElement[]>([]);
+  const [getElements, setElements] = useState<DrawElement[]>([]);
+
   const canvasRef = useRef<HTMLCanvasElement>(null!);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null!);
-  const { roomId } = useParams();
 
+  const { roomId } = useParams();
   const socket = useSocket();
 
   useEffect(() => {
-    if (!roomId || !socket.connected) return;
+    if (!roomId || !socket.connected) {
+      logEvent(
+        "RoomOrSocketNotReady",
+        { roomId, socketConnected: socket.connected },
+        LogLevel.WARN
+      );
+      return;
+    }
+
     socket.on("userIsJoined", (data) => {
-      console.log(data.user);
       if (data.success) {
-        console.log("User joined successfully");
+        logEvent("UserJoinedRoom", { roomId, user: data.user }, LogLevel.INFO);
       } else {
-        console.log("Error joining room");
+        logEvent(
+          "UserJoinError",
+          { roomId, user: data.user, error: data.error || "No error provided" },
+          LogLevel.ERROR
+        );
       }
     });
+
     return () => {
       socket.off("userIsJoined");
     };
   }, [roomId, socket]);
-
-  const [getElements, setElements] = useState<DrawElement[]>([]);
-  const handleClear = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    }
-    setElements([]);
-    socket.emit("clearCanvas");
-  };
 
   useEffect(() => {
     const handleUpdateCanvas = (updatedData: {
       type: string;
       element: DrawElement;
     }) => {
+      logEvent(
+        "HandleUpdateCanvas Called",
+        { type: updatedData.type },
+        LogLevel.DEBUG
+      );
+
       if (updatedData.type === "updateCanvas") {
-        setElements((prevElements) => [...prevElements, updatedData.element]);
+        setElements((prev) => [...prev, updatedData.element]);
+        logEvent(
+          "CanvasUpdated",
+          { element: updatedData.element },
+          LogLevel.INFO
+        );
+      } else {
+        logEvent(
+          "UnexpectedUpdateType",
+          { type: updatedData.type },
+          LogLevel.WARN
+        );
       }
     };
+
     const handleUpdateUndoCanvas = (updatedData: {
       type: string;
       element: DrawElement;
     }) => {
+      logEvent(
+        "HandleUpdateUndoCanvas Called",
+        { type: updatedData.type },
+        LogLevel.DEBUG
+      );
+
       if (updatedData.type === "undoCanvas") {
         if (getElements.length === 1) {
-          setHistory((prev) => [...prev, getElements[getElements.length - 1]]);
+          setHistory((prev) => [...prev, getElements[0]]);
           handleClear();
         } else {
-          // console.log("before slice" + getElements.length);
-          setHistory((prevHistory) => [
-            ...prevHistory,
-            getElements[getElements.length - 1],
-          ]);
-          setElements((prevElement) =>
-            prevElement.slice(0, prevElement.length - 1)
-          );
+          setHistory((prev) => [...prev, getElements[getElements.length - 1]]);
+          setElements((prev) => prev.slice(0, prev.length - 1));
         }
+
+        logEvent("CanvasUndo", { element: updatedData.element }, LogLevel.INFO);
       }
     };
-    const handleupdateClearCanvas = (updatedData: { type: string }) => {
+
+    const handleUpdateClearCanvas = (updatedData: { type: string }) => {
+      logEvent(
+        "HandleUpdateClearCanvas Called",
+        { type: updatedData.type },
+        LogLevel.DEBUG
+      );
+
       if (updatedData.type === "clearCanvas") {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.clearRect(
-            0,
-            0,
-            canvasRef.current.width,
-            canvasRef.current.height
-          );
+        if (getElements.length > 0) {
+          setHistory((prev) => [...prev, getElements[getElements.length - 1]]);
         }
+
+        const canvas = canvasRef.current;
+        const ctx = canvas?.getContext("2d");
+        if (!ctx) {
+          logEvent(
+            "CanvasContextError",
+            { message: "2D context not available" },
+            LogLevel.ERROR
+          );
+          return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         setElements([]);
+        logEvent("CanvasCleared", {}, LogLevel.INFO);
       }
     };
 
     socket.on("updateCanvas", handleUpdateCanvas);
     socket.on("updateUndoCanvas", handleUpdateUndoCanvas);
-    socket.on("updateClearCanvas", handleupdateClearCanvas);
+    socket.on("updateClearCanvas", handleUpdateClearCanvas);
 
     return () => {
       socket.off("updateCanvas", handleUpdateCanvas);
+      socket.off("updateUndoCanvas", handleUpdateUndoCanvas);
+      socket.off("updateClearCanvas", handleUpdateClearCanvas);
     };
-  }, [socket]);
+  }, [socket, getElements]);
 
-  const handleUndo: MouseEventHandler<HTMLButtonElement> = () => {
-    if (getElements.length == 0) return;
-    if (getElements.length === 1) {
-      setHistory((prev) => [...prev, getElements[getElements.length - 1]]);
-      handleClear();
-    } else {
-      // console.log("before slice" + getElements.length);
-      setHistory((prevHistory) => [
-        ...prevHistory,
-        getElements[getElements.length - 1],
-      ]);
-      setElements((prevElement) =>
-        prevElement.slice(0, prevElement.length - 1)
+  const handleClear = () => {
+    logEvent(
+      "HandleClear Triggered",
+      { elementsCount: getElements.length },
+      LogLevel.DEBUG
+    );
+    try {
+      if (getElements.length > 0) {
+        setHistory((prev) => [...prev, getElements[getElements.length - 1]]);
+      }
+
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!ctx) {
+        logEvent(
+          "CanvasContextError",
+          { message: "Canvas context unavailable during clear" },
+          LogLevel.ERROR
+        );
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setElements([]);
+      socket.emit("clearCanvas");
+
+      logEvent("CanvasClearedAndEmitted", {}, LogLevel.INFO);
+    } catch (err: any) {
+      logEvent(
+        "HandleClearError",
+        { error: err.message || String(err) },
+        LogLevel.ERROR
       );
     }
-    socket.emit("undoCanvas", getHistory[getHistory.length - 1]);
+  };
+
+  const handleUndo: MouseEventHandler<HTMLButtonElement> = () => {
+    if (getElements.length === 0) {
+      logEvent("UndoBlocked", { reason: "No elements to undo" }, LogLevel.WARN);
+      return;
+    }
+
+    try {
+      if (getElements.length === 1) {
+        setHistory((prev) => [...prev, getElements[0]]);
+        handleClear();
+      } else {
+        setHistory((prev) => [...prev, getElements[getElements.length - 1]]);
+        setElements((prev) => prev.slice(0, prev.length - 1));
+      }
+
+      const lastDrawn = getHistory[getHistory.length - 1];
+      socket.emit("undoCanvas", lastDrawn);
+      logEvent("UndoPerformed", { lastDrawn }, LogLevel.INFO);
+    } catch (err: any) {
+      logEvent(
+        "UndoError",
+        { error: err.message || String(err) },
+        LogLevel.ERROR
+      );
+    }
   };
 
   const handleRedo = () => {
-    if (getHistory.length === 0) return;
+    if (getHistory.length === 0) {
+      logEvent("RedoBlocked", { reason: "History empty" }, LogLevel.WARN);
+      return;
+    }
 
-    const lastElement = getHistory[getHistory.length - 1];
-    if (!lastElement) return; // Extra safeguard
+    try {
+      const lastElement = getHistory[getHistory.length - 1];
+      if (!lastElement) {
+        logEvent(
+          "RedoError",
+          { message: "Last history element not found" },
+          LogLevel.ERROR
+        );
+        return;
+      }
 
-    setElements((prevElements) => [...prevElements, lastElement]);
-    setHistory((prevHistory) => prevHistory.slice(0, prevHistory.length - 1));
+      setElements((prev) => [...prev, lastElement]);
+      setHistory((prev) => prev.slice(0, prev.length - 1));
+      socket.emit("drawElement", lastElement);
 
-    socket.emit("drawElement", lastElement);
+      logEvent("RedoPerformed", { lastElement }, LogLevel.INFO);
+    } catch (err: any) {
+      logEvent(
+        "RedoException",
+        { error: err.message || String(err) },
+        LogLevel.ERROR
+      );
+    }
   };
+
   return (
     <div>
       <div>Whiteboard</div>

@@ -8,6 +8,7 @@ import React, {
 import "./css/canvas.css";
 import rough from "roughjs";
 import { useSocket } from "../hooks/socketContext.tsx";
+import { logEvent, LogLevel } from "../utils/logger";
 
 interface DrawElement {
   type: string;
@@ -276,7 +277,21 @@ const Canvas: React.FC<CanvasProps> = ({
     // console.log("Mouse released", e);
     if (getElements.length === 0) return;
     const newGetElements = getElements[getElements.length - 1];
-    socket.emit("drawElement", newGetElements);
+    socket.emit(
+      "drawElement",
+      newGetElements,
+      (response: { status: string; error?: string }) => {
+        if (response.status === "ok") {
+          logEvent("Element drawn successfully", newGetElements, LogLevel.INFO);
+        } else {
+          logEvent(
+            "Failed to draw element",
+            { element: newGetElements, error: response.error },
+            LogLevel.ERROR
+          );
+        }
+      }
+    );
     setIsDrawing(false);
   };
 

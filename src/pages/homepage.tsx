@@ -1,13 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "./css/homepage.css";
+import { logEvent, LogLevel } from "../utils/logger";
 
 import Feature from "../components/feature";
-import "./css/homepage.css";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const goToRooms = () => {
-    navigate("/rooms");
+    try {
+      logEvent("CTA_Clicked", {
+        location: "Hero Section",
+        button: "Get Started",
+      });
+      navigate("/rooms");
+      logEvent("Navigation_Success", { to: "/rooms" });
+    } catch (error) {
+      logEvent(
+        "Navigation_Failure",
+        { to: "/rooms", error: getErrorMessage(error) },
+        LogLevel.ERROR
+      );
+    }
   };
   return (
     <div id="main-container" className="bg-[#FFF7E3] ">
@@ -140,3 +154,6 @@ const HomePage = () => {
   );
 };
 export default HomePage;
+function getErrorMessage(error: unknown) {
+  throw new Error("Function not implemented.");
+}

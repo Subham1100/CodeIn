@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSocket } from "../hooks/socketContext.tsx";
+import { logEvent, LogLevel } from "../utils/logger";
 
 import Feature from "../components/feature";
 
-const room = () => {
+const Room = () => {
+  const [placeholderName, setplaceholderName] = useState("Enter Name");
+  const [placeholderRoomId, setplaceholderRoomId] = useState("Room Code");
+
+  const socket = useSocket();
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const [placeholderName, setplaceholderName] = useState("Enter Name");
-  const [placeholderRoomId, setplaceholderRoomId] = useState("Room Code");
   const roomIds: number[] = [];
 
   const generateRoomCode = (): number => {
@@ -25,6 +30,7 @@ const room = () => {
     roomIds.push(RoomId);
     return RoomId;
   };
+
   const generateUuid = (): string => {
     const randomLetter = String.fromCharCode(
       97 + Math.floor(Math.random() * 26)
@@ -32,8 +38,7 @@ const room = () => {
     const randomNumber = Math.floor(1 + Math.random() * 99999999); // 1 to 100000000
     return `${randomLetter}${randomNumber}`;
   };
-  const socket = useSocket();
-  const navigate = useNavigate();
+
   const handleCreate = () => {
     const RoomId = generateRoomCode();
     const uuid = generateUuid();
@@ -44,7 +49,19 @@ const room = () => {
       host: true,
       presenter: false,
     };
-    socket.emit("joinRoom", roomData);
+    socket.emit(
+      "joinRoom",
+      roomData,
+      (response: { status: string; error?: string }) => {
+        if (response.status === "ok") {
+          logEvent("Successfully joined room", roomData, LogLevel.INFO);
+          navigate(`/rooms/${RoomId}`);
+        } else {
+          logEvent("Failed to join room", response.error, LogLevel.ERROR);
+          alert("Failed to join room: " + response.error); // optional: user feedback
+        }
+      }
+    );
     navigate(`/rooms/${RoomId}`);
   };
 
@@ -58,7 +75,25 @@ const room = () => {
       host: true,
       presenter: false,
     };
-    socket.emit("joinRoom", roomData);
+    logEvent("Joining Room", roomData, LogLevel.INFO);
+
+    socket.emit(
+      "joinRoom",
+      roomData,
+      (response: { status: string; error?: string }) => {
+        if (response.status === "ok") {
+          logEvent("Successfully joined room", roomData, LogLevel.INFO);
+          navigate(`/rooms/${RoomId}`);
+        } else {
+          logEvent(
+            "Failed to join room",
+            { roomData, error: response.error },
+            LogLevel.ERROR
+          );
+          alert(`Error joining room: ${response.error}`);
+        }
+      }
+    );
     navigate(`/rooms/${RoomId}`);
   };
   return (
@@ -91,12 +126,12 @@ const room = () => {
               onChange={(e) => setplaceholderRoomId(e.target.value)}
               onBlur={() => {
                 if (placeholderRoomId.trim() === "") {
-                  setplaceholderRoomId("Enter Name"); // ✅ Restore text only if empty
+                  setplaceholderRoomId("Enter Name");
                 }
               }}
               onFocus={() => {
                 if (placeholderRoomId === "Enter Name") {
-                  setplaceholderRoomId(""); // ✅ Clear only if it was the default text
+                  setplaceholderRoomId("");
                 }
               }}
             />
@@ -144,4 +179,4 @@ const room = () => {
   );
 };
 
-export default room;
+export default Room;
