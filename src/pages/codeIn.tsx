@@ -3,6 +3,7 @@ import React from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import CodeSection from "./CodeSection";
+import Whiteboard from "./whiteboard";
 
 const CodeIn = () => {
   return (
@@ -22,7 +23,9 @@ const CodeIn = () => {
           </div>
         </PanelResizeHandle>
 
-        <Panel defaultSize={25}>{/* <Whiteboard /> */}</Panel>
+        <Panel defaultSize={25}>
+          <Whiteboard />
+        </Panel>
       </PanelGroup>
     </div>
   );

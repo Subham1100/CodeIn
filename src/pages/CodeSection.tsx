@@ -10,6 +10,14 @@ import { python } from "@codemirror/lang-python";
 
 import { logEvent, LogLevel } from "../utils/logger";
 
+const data = {
+  boilerplateUser: {
+    cpp: `vector<int> twoSum(vector<int>& nums, int target) {\n \n}`,
+    java: `public int[] twoSum(int[] nums, int target) {\n\n}`,
+    python: `def twoSum(self, nums: List[int], target: int) -> List[int]:\n\n`,
+  },
+};
+
 const CodeSection = () => {
   const [cppValue, setCppValue] = useState(
     `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`
@@ -47,16 +55,12 @@ const CodeSection = () => {
 
   const [language, setLanguage] = useState<keyof typeof languageOptions>("cpp");
   const [code, setCode] = useState(languageOptions["cpp"].value);
-  const [responseUpdate, setResonseUpdate] = useState("");
+  const [responseUpdate, setResponseUpdate] = useState("");
+  const [expectedResponseUpdate, setExpectedResponseUpdate] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [testCaseInput, setTestCaseInput] = useState("");
-
-  useEffect(() => {
-    const pElement = document.getElementById("responseParagraph");
-    if (pElement) {
-      pElement.innerHTML = responseUpdate;
-    }
-  }, [responseUpdate]);
+  const [SelectedProblem, setSelectedProblem] = useState(0);
+  const [IsSubumit, setISsubmit] = useState(false);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const lang = e.target.value as keyof typeof languageOptions;
@@ -77,8 +81,22 @@ const CodeSection = () => {
     }
   };
 
+  const loadBoilerplate = async (filename: string): Promise<string> => {
+    const response = await fetch(`../../temp/${SelectedProblem}/${filename}`);
+    return await response.text();
+  };
+  const generateNewCode = async () => {
+    const [boilerplateUser1, boilerplateUser2] = await Promise.all([
+      loadBoilerplate("boilerplateCpp1.txt"),
+      loadBoilerplate("boilerplateCpp2.txt"),
+    ]);
+    const newCode = boilerplateUser1 + code + `\n\n` + boilerplateUser2;
+    return newCode;
+  };
   const handleRunCode = async () => {
     try {
+      const newCode = await generateNewCode();
+
       const response = await fetch("http://127.0.0.1:3000/run", {
         method: "POST",
         headers: {
@@ -86,7 +104,7 @@ const CodeSection = () => {
         },
         body: JSON.stringify({
           language,
-          code,
+          code: newCode,
           input: testCaseInput,
         }),
       });
@@ -98,7 +116,97 @@ const CodeSection = () => {
       if (response) {
         const data = await response.json();
 
-        setResonseUpdate(data.output);
+        const [expectedOutput, userOutput] = data.output.split("---SPLIT---");
+
+        setExpectedResponseUpdate(expectedOutput.trim());
+        setResponseUpdate(userOutput.trim());
+        logEvent("Code executed successfully", { data }, LogLevel.INFO);
+      } else {
+        logEvent("Response was not OK", LogLevel.WARN);
+      }
+      // setResonseUpdate(stringifiedData);
+    } catch (error) {
+      logEvent("Code execution error", { error }, LogLevel.ERROR);
+    }
+    setISsubmit(false);
+  };
+
+  const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTestCaseInput("1 " + e.target.value);
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // reset height
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + "px";
+    }
+  };
+  const handleResetButton = () => {
+    if (SelectedProblem == 0) {
+      if (language === "cpp")
+        setCode(
+          `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`
+        );
+      else if (language === "java") {
+        setCode(
+          `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Java!");\n  }\n}`
+        );
+      } else if (language === "python") {
+        setCode(`print("Hello, Python!")\nfor i in range(5):\n    print(i)`);
+      }
+    } else {
+      setCode(data.boilerplateUser[language]);
+    }
+    setISsubmit(false);
+  };
+
+  const handleQuestionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = parseInt(e.target.value);
+    console.log(selected);
+    setSelectedProblem(selected);
+  };
+
+  useEffect(() => {
+    if (SelectedProblem === 0) {
+      setCppValue(languageOptions.cpp.value);
+      setJavaValue(languageOptions.java.value);
+      setPythonValue(languageOptions.python.value);
+      setCode(languageOptions[language].value);
+    } else {
+      setCppValue(data.boilerplateUser.cpp);
+      setJavaValue(data.boilerplateUser.java);
+      setPythonValue(data.boilerplateUser.python);
+    }
+    setCode(data.boilerplateUser[language]);
+  }, [SelectedProblem]);
+
+  const handleSubmitCode = async () => {
+    try {
+      const newCode = await generateNewCode();
+
+      const response = await fetch("http://127.0.0.1:3000/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language,
+          code: newCode,
+          input: testCaseInput,
+        }),
+      });
+      logEvent(
+        "Received response from server",
+        { status: response.status },
+        LogLevel.INFO
+      );
+      if (response) {
+        const data = await response.json();
+
+        const [expectedOutput, userOutput] = data.output.split("---SPLIT---");
+
+        setExpectedResponseUpdate(expectedOutput.trim());
+        setResponseUpdate(userOutput.trim());
+        setISsubmit(true);
         logEvent("Code executed successfully", { data }, LogLevel.INFO);
       } else {
         logEvent("Response was not OK", LogLevel.WARN);
@@ -108,18 +216,6 @@ const CodeSection = () => {
       logEvent("Code execution error", { error }, LogLevel.ERROR);
     }
   };
-
-  const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTestCaseInput(e.target.value);
-
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // reset height
-      textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + "px";
-    }
-  };
-
-  const handleSubmitCode = async () => {};
   return (
     <div className="h-screen w-full">
       <PanelGroup
@@ -151,6 +247,25 @@ const CodeSection = () => {
               >
                 Submit
               </button>
+              <button
+                onClick={handleResetButton}
+                className="bg-blue-500 rounded-xl p-2"
+              >
+                Reset
+              </button>
+
+              <select
+                onChange={handleQuestionChange}
+                className="border rounded px-2 py-1 w-full"
+              >
+                <option value="" disabled>
+                  ----- Select Leetcode Problem -----
+                </option>
+                <option value="0"> Back to Editor</option>
+                <option value="1"> 1. Two Sum</option>
+                <option value="2">2. Merge Two Sorted Lists</option>
+                <option value="3">3. Same Tree</option>
+              </select>
             </div>
 
             <CodeMirror
@@ -177,17 +292,31 @@ const CodeSection = () => {
             <h1 className="text-2xl font-bold ">Test Case</h1>
             <div className="  w-full h-20 flex gap-6">
               <label htmlFor="inputTestCase" className="font-bold">
-                Enter:
+                Input:
               </label>
               <textarea
                 id="inputTestCase"
                 ref={textareaRef}
                 name="inputTestCase"
-                className="w-full resize bg-[#333333] p-3"
+                className="w-full h-[40px] mr-4 resize bg-[#333333] p-2"
                 onChange={handleChangeTextArea}
               />
             </div>
-            {responseUpdate && (
+            {responseUpdate === expectedResponseUpdate &&
+              responseUpdate !== "" && (
+                <div className="text-[#00e636]">Sucess</div>
+              )}
+            {responseUpdate === expectedResponseUpdate && IsSubumit && (
+              <div className="text-[#00e636]">All test case passed.</div>
+            )}
+            {responseUpdate !== expectedResponseUpdate &&
+              responseUpdate !== "" && (
+                <div className="text-[#a03112]">Error</div>
+              )}
+            {responseUpdate !== expectedResponseUpdate &&
+              responseUpdate !== "" &&
+              IsSubumit && <div>Test case Failed</div>}
+            {responseUpdate && !IsSubumit && (
               <div className="mt-4 p-4 bg-[#1e1e2f] rounded-lg text-left w-full text-white">
                 <div className="mb-2">
                   <h3 className="text-lg font-semibold text-green-400">
@@ -202,8 +331,7 @@ const CodeSection = () => {
                     Expected Output:
                   </h3>
                   <pre className="bg-black text-white p-2 rounded mt-1 overflow-auto whitespace-pre-wrap">
-                    {/* TODO: Replace this with actual expected output */}
-                    Your expected output here...
+                    {expectedResponseUpdate}
                   </pre>
                 </div>
               </div>

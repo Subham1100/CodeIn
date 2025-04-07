@@ -34,10 +34,8 @@ io.on("connection", (socket) => {
       const { name, userId, roomId, host, presenter } = data;
       console.log("Joining Room:", data);
       socket.join(roomId);
-      callback({ status: "ok" });
     } catch (err) {
       console.error("Error joining room:", err);
-      callback({ status: "error", error: "Failed to join room." });
     }
   });
 
@@ -47,10 +45,8 @@ io.on("connection", (socket) => {
         type: "updateCanvas",
         element: newElement,
       });
-      callback({ status: "ok" });
     } catch (err) {
       console.error("Error in drawElement:", err);
-      callback({ status: "error", error: "Failed to broadcast drawing." });
     }
   });
 
@@ -59,10 +55,8 @@ io.on("connection", (socket) => {
       socket.broadcast.emit("updateClearCanvas", {
         type: "clearCanvas",
       });
-      callback({ status: "ok" });
     } catch (err) {
       console.error("Error in clearCanvas:", err);
-      callback({ status: "error", error: "Failed to clear canvas." });
     }
   });
 
@@ -71,10 +65,8 @@ io.on("connection", (socket) => {
       socket.broadcast.emit("updateUndoCanvas", {
         type: "undoCanvas",
       });
-      callback({ status: "ok" });
     } catch (err) {
       console.error("Error in undoCanvas:", err);
-      callback({ status: "error", error: "Failed to undo." });
     }
   });
 
@@ -83,10 +75,8 @@ io.on("connection", (socket) => {
       socket.broadcast.emit("updateRedoCanvas", {
         type: "redoCanvas",
       });
-      callback({ status: "ok" });
     } catch (err) {
       console.error("Error in redoCanvas:", err);
-      callback({ status: "error", error: "Failed to redo." });
     }
   });
 
@@ -102,8 +92,6 @@ app.get("/", (req, res) => {
 
 app.options("/run", cors()); // Handle preflight explicitly
 app.post("/run", (req, res) => {
-  console.log(1);
-
   const { code, language, input = "" } = req.body;
 
   const fileNames = {
@@ -126,7 +114,70 @@ app.post("/run", (req, res) => {
   let dockerCommand = "";
 
   if (language === "cpp") {
-    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "g++ /app/main.cpp -o /app/main && echo '${input}' | /app/main"`;
+    const solutionPath = "../temp/1/SolutionCpp.txt";
+    const destinationPath = path.join(tempDir, "solution.cpp");
+
+    fs.copyFileSync(solutionPath, destinationPath);
+    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "\
+      g++ -std=c++20 /app/main.cpp -o /app/main && \
+      g++ -std=c++20 /app/solution.cpp -o /app/user_sol && \
+      echo '${input}' | /app/main > /app/main_output.txt && \
+      echo '${input}' | /app/user_sol > /app/user_output.txt && \
+      cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
+  } else if (language === "java") {
+    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "javac /app/Main.java && echo '${input}' | java -cp /app Main"`;
+  } else if (language === "python") {
+    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "echo '${input}' | python3 /app/main.py"`;
+  } else {
+    return res.status(400).json({ output: "Unsupported language." });
+  }
+
+  exec(dockerCommand, (err, stdout, stderr) => {
+    if (err) {
+      return res.json({ output: stderr || err.message });
+    }
+
+    res.json({ output: stdout });
+  });
+});
+
+app.post("/submit", (req, res) => {
+  const { code, language, input = "" } = req.body;
+
+  const fileNames = {
+    cpp: "main.cpp",
+    java: "Main.java",
+    python: "main.py",
+  };
+  const os = require("os");
+
+  const fileName = fileNames[language];
+  const tempDir = path.join(os.tmpdir(), "whiteboard-runner");
+  const filePath = path.join(tempDir, fileName);
+
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir);
+  }
+
+  fs.writeFileSync(filePath, code);
+
+  let dockerCommand = "";
+
+  if (language === "cpp") {
+    const solutionPath = "../temp/1/SolutionCpp.txt";
+    const testCasePath = "../temp/1/test_case.txt";
+
+    const destinationSolutionPath = path.join(tempDir, "solution.cpp");
+    const destinationTestCasePath = path.join(tempDir, "test_case.txt");
+
+    fs.copyFileSync(solutionPath, destinationSolutionPath);
+    fs.copyFileSync(testCasePath, destinationTestCasePath);
+    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "\
+      g++ -std=c++20 /app/main.cpp -o /app/main && \
+      g++ -std=c++20 /app/solution.cpp -o /app/user_sol && \
+     /app/main < /app/test_case.txt  > /app/main_output.txt && \
+      /app/user_sol < /app/test_case.txt > /app/user_output.txt && \
+      cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else if (language === "java") {
     dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "javac /app/Main.java && echo '${input}' | java -cp /app Main"`;
   } else if (language === "python") {

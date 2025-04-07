@@ -1,0 +1,44 @@
+vector<int> parseStringToArray(const string& input) {
+    vector<int> result;
+    string cleaned;
+
+    for (char ch : input) {
+        if (ch != '[' && ch != ']') {
+            cleaned += ch;
+        }
+    }
+
+    stringstream ss(cleaned);
+    string item;
+
+    while (std::getline(ss, item, ',')) {
+        result.push_back(std::stoi(item));
+    }
+
+    return result;
+}
+
+
+int main() {
+    fastIO();
+    int t ;
+    cin >> t; // Uncomment if multiple test cases
+    while (t--) {
+       string s;
+       char c;cin>>c;
+       if(c!='['){cout<<"Invalid Input"<<endl;return 0;}
+       while(c!=']')
+       {
+            s+=c;
+            cin>>c;
+       }
+       s+=']';
+       int target;cin>>target;
+       vector<int> ar = parseStringToArray(s);
+       vector<int> res(2,0);
+       res = twoSum(ar,target);
+       for(auto i: res)cout<<i<<" ";
+       cout<<endl;
+    }
+    return 0;
+}
