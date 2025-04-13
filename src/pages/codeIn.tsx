@@ -13,7 +13,7 @@ const CodeIn = () => {
         direction="horizontal"
         className="rounded-lg border "
       >
-        <Panel defaultSize={25} minSize={25}>
+        <Panel defaultSize={25} minSize={25} className="h-full overflow-auto">
           <CodeSection />
         </Panel>
 
@@ -23,7 +23,7 @@ const CodeIn = () => {
           </div>
         </PanelResizeHandle>
 
-        <Panel defaultSize={25}>
+        <Panel defaultSize={25} className="h-full overflow-auto">
           <Whiteboard />
         </Panel>
       </PanelGroup>

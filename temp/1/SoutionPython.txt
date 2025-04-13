@@ -4,6 +4,8 @@ def parse_string_to_array(input_str):
         return []
     return list(map(int, input_str.split(',')))
 
+#-----------startofcode--------------------
+
 def twoSum(nums, target):
     mp = {}  # value -> index
 
@@ -15,7 +17,7 @@ def twoSum(nums, target):
 
     return []
 
-
+#-----------endofcode--------------------
 def main():
     t = 1
     while t > 0:

@@ -10,14 +10,6 @@ import { python } from "@codemirror/lang-python";
 
 import { logEvent, LogLevel } from "../utils/logger";
 
-const data = {
-  boilerplateUser: {
-    cpp: `vector<int> twoSum(vector<int>& nums, int target) {\n \n}`,
-    java: `public int[] twoSum(int[] nums, int target) {\n\n}`,
-    python: `def twoSum(self, nums: List[int], target: int) -> List[int]:\n\n`,
-  },
-};
-
 const CodeSection = () => {
   const [cppValue, setCppValue] = useState(
     `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`
@@ -85,13 +77,47 @@ const CodeSection = () => {
     const response = await fetch(`../../temp/${SelectedProblem}/${filename}`);
     return await response.text();
   };
+
+  const splitBoilerplate = (
+    boilerplate: string,
+    startMarker: string,
+    endMarker: string
+  ) => {
+    const startIdx = boilerplate.indexOf(startMarker);
+    const endIdx = boilerplate.indexOf(endMarker) + endMarker.length;
+
+    if (startIdx === -1 || endIdx === -1) {
+      throw new Error("Start or end marker not found in the boilerplate.");
+    }
+
+    const beforeStart = boilerplate.slice(0, startIdx);
+    const middle = boilerplate.slice(startIdx, endIdx);
+    const afterEnd = boilerplate.slice(endIdx);
+
+    return {
+      beforeStart, // code before startMarker
+      middle, // code between and including startMarker & endMarker
+      afterEnd, // code after endMarker
+    };
+  };
+
   const generateNewCode = async () => {
-    const [boilerplateUser1, boilerplateUser2] = await Promise.all([
-      loadBoilerplate("boilerplateCpp1.txt"),
-      loadBoilerplate("boilerplateCpp2.txt"),
-    ]);
-    const newCode = boilerplateUser1 + code + `\n\n` + boilerplateUser2;
-    return newCode;
+    try {
+      const [boilerplateUser1] = await Promise.all([
+        loadBoilerplate("solutionCpp.txt"),
+      ]);
+
+      const { beforeStart, middle, afterEnd } = splitBoilerplate(
+        boilerplateUser1,
+        "//-----------startofcode--------------------",
+        "//-----------endofcode--------------------"
+      );
+      const newCode = beforeStart + code + afterEnd;
+      return newCode;
+    } catch (error) {
+      logEvent("Error generating new code", error, LogLevel.ERROR);
+      throw error;
+    }
   };
   const handleRunCode = async () => {
     try {
@@ -139,6 +165,13 @@ const CodeSection = () => {
       textareaRef.current.style.height =
         textareaRef.current.scrollHeight + "px";
     }
+  };
+  const data = {
+    boilerplateUser: {
+      cpp: `vector<int> twoSum(vector<int>& nums, int target) {\n \n}`,
+      java: `public int[] twoSum(int[] nums, int target) {\n\n}`,
+      python: `def twoSum(self, nums: List[int], target: int) -> List[int]:\n\n`,
+    },
   };
   const handleResetButton = () => {
     if (SelectedProblem == 0) {
@@ -223,8 +256,8 @@ const CodeSection = () => {
         direction="vertical"
         className="h-full w-full rounded-lg border"
       >
-        <Panel defaultSize={60} minSize={20}>
-          <div className="h-full w-full p-4">
+        <Panel defaultSize={60} minSize={20} className="h-full overflow-scroll">
+          <div className="h-full w-full p-4 overflow-scroll">
             <div className="mb-2 flex gap-5">
               <select
                 className="border rounded px-2 py-1"
@@ -263,8 +296,14 @@ const CodeSection = () => {
                 </option>
                 <option value="0"> Back to Editor</option>
                 <option value="1"> 1. Two Sum</option>
-                <option value="2">2. Merge Two Sorted Lists</option>
-                <option value="3">3. Same Tree</option>
+                <option value="2">2. Palindrome Number</option>
+                <option value="3">3. Valid Parentheses</option>
+                <option value="4">
+                  4. Remove Duplicates from Sorted Array
+                </option>
+                <option value="4">
+                  5. Find the Index of the First Occurrence in a String
+                </option>
               </select>
             </div>
 
@@ -287,8 +326,8 @@ const CodeSection = () => {
           </div>
         </PanelResizeHandle>
 
-        <Panel defaultSize={40} minSize={20}>
-          <div className="flex items-center  flex-col  w-full h-full bg-[#191e2e] text-[#d0d1cb]">
+        <Panel defaultSize={40} minSize={20} className="overflow-scroll">
+          <div className="flex items-center  flex-col  w-full h-full bg-[#191e2e] text-[#d0d1cb] overflow-scroll">
             <h1 className="text-2xl font-bold ">Test Case</h1>
             <div className="  w-full h-20 flex gap-6">
               <label htmlFor="inputTestCase" className="font-bold">
@@ -317,7 +356,7 @@ const CodeSection = () => {
               responseUpdate !== "" &&
               IsSubumit && <div>Test case Failed</div>}
             {responseUpdate && !IsSubumit && (
-              <div className="mt-4 p-4 bg-[#1e1e2f] rounded-lg text-left w-full text-white">
+              <div className="mt-4 p-4 bg-[#1e1e2f] rounded-lg text-left w-full text-white h-full overflow-scroll">
                 <div className="mb-2">
                   <h3 className="text-lg font-semibold text-green-400">
                     Output:

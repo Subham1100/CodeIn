@@ -238,7 +238,7 @@ const Whiteboard = () => {
   };
 
   return (
-    <div>
+    <div className="overflow-scroll h-full">
       <div>Whiteboard</div>
       <div>Users Online</div>
       <div id="tools_container">

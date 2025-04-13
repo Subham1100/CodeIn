@@ -7,7 +7,7 @@ void fastIO() {
     cout.tie(nullptr);
 }
 
-
+//-----------startofcode--------------------
 vector<int> twoSum(vector<int>& nums, int target) {
 
     unordered_map<int, int> mp;  // value -> index
@@ -23,7 +23,7 @@ vector<int> twoSum(vector<int>& nums, int target) {
     return {};  // No solution found
 }
 
-
+//-----------endofcode--------------------
 
 vector<int> parseStringToArray(const string& input) {
     vector<int> result;
@@ -45,12 +45,8 @@ vector<int> parseStringToArray(const string& input) {
     return result;
 }
 
-
-int main() {
-    fastIO();
-    int t ;
-    cin >> t; 
-    while (t--) {
+string input_list()
+{
        string s;
        char c;cin>>c;
        if(c!='['){cout<<"Invalid Input"<<endl;return 0;}
@@ -60,6 +56,17 @@ int main() {
             cin>>c;
        }
        s+=']';
+       
+       return s;
+}
+int main() {
+    fastIO();
+    int t ;
+    cin >> t; 
+    while (t--) {
+       string s;
+       s = input_list();
+       
        int target;cin>>target;
        vector<int> ar = parseStringToArray(s);
        vector<int> res(2,0);

@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+
 require("dotenv").config({ path: "../.env" });
 
 const cors = require("cors");
@@ -125,9 +126,24 @@ app.post("/run", (req, res) => {
       echo '${input}' | /app/user_sol > /app/user_output.txt && \
       cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else if (language === "java") {
-    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "javac /app/Main.java && echo '${input}' | java -cp /app Main"`;
+    const solutionPath = "../temp/1/SolutionJava.txt";
+    const destinationPath = path.join(tempDir, "solution.java");
+
+    fs.copyFileSync(solutionPath, destinationPath);
+    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "\
+    javac /app/Main.java /app/solution.java && \
+    echo '${input}' | java -cp /app Main > /app/main_output.txt && \
+    echo '${input}' | java -cp /app Solution > /app/user_output.txt && \
+    cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else if (language === "python") {
-    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "echo '${input}' | python3 /app/main.py"`;
+    const solutionPath = "../temp/1/SoutionPython.txt";
+    const destinationPath = path.join(tempDir, "solution.py");
+
+    fs.copyFileSync(solutionPath, destinationPath);
+    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "\
+    echo '${input}' | python3 /app/main.py > /app/main_output.txt && \
+    echo '${input}' | python3 /app/solution.py > /app/user_output.txt && \
+    cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else {
     return res.status(400).json({ output: "Unsupported language." });
   }

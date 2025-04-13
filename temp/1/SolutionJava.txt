@@ -3,6 +3,8 @@ import java.util.*;
 
 public class Main {
 
+
+//-----------startofcode--------------------
    public static List<Integer> twoSum(int[] nums, int target) {
     Map<Integer, Integer> map = new HashMap<>();  // value -> index
 
@@ -17,6 +19,7 @@ public class Main {
     return new ArrayList<>();
 }
 
+//-----------endofcode--------------------
 
     public static int[] parseStringToArray(String input) {
         input = input.replace("[", "").replace("]", "");
