@@ -1,6 +1,32 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+const logger = require("./logger");
+const morgan = require("morgan");
+
+//logger
+
+// logger.info("This is an info message");
+// logger.error("This is an error message");
+// logger.warn("This is a warning message");
+// logger.debug("This is a debug message");
+
+const morganFormat = ":method :url :status :response-time ms";
+app.use(
+  morgan(morganFormat, {
+    stream: {
+      write: (message) => {
+        const logObject = {
+          method: message.split(" ")[0],
+          url: message.split(" ")[1],
+          status: message.split(" ")[2],
+          responseTime: message.split(" ")[3],
+        };
+        logger.info(JSON.stringify(logObject));
+      },
+    },
+  })
+);
 
 require("dotenv").config({ path: "../.env" });
 
@@ -28,12 +54,12 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("user connected");
+  // console.log("user connected");
 
   socket.on("joinRoom", (data, callback) => {
     try {
       const { name, userId, roomId, host, presenter } = data;
-      console.log("Joining Room:", data);
+      // console.log("Joining Room:", data);
       socket.join(roomId);
     } catch (err) {
       console.error("Error joining room:", err);
@@ -82,7 +108,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    // console.log("User disconnected");
   });
 });
 
@@ -213,5 +239,5 @@ app.post("/submit", (req, res) => {
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
-  console.log(`server is running on http://localhost:${port}`);
+  // console.log(`server is running on http://localhost:${port}`);
 });
