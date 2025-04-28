@@ -19,7 +19,8 @@
   "homepage": "https://github.com/Subham1100/Whiteboard#readme",
   "dependencies": {
     "express": "^5.1.0",
-    "mongoose": "^8.13.2",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.14.0",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.9",
     "socket.io": "^4.8.1",

@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/homepage.css";
 import { logEvent, LogLevel } from "../utils/logger";

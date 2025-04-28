@@ -49,10 +49,12 @@ const CodeSection = () => {
   const [code, setCode] = useState(languageOptions["cpp"].value);
   const [responseUpdate, setResponseUpdate] = useState("");
   const [expectedResponseUpdate, setExpectedResponseUpdate] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const [testCaseInput, setTestCaseInput] = useState("");
   const [SelectedProblem, setSelectedProblem] = useState(0);
   const [IsSubumit, setISsubmit] = useState(false);
+  const [codeError, setCodeError] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const lang = e.target.value as keyof typeof languageOptions;
@@ -121,9 +123,14 @@ const CodeSection = () => {
   };
   const handleRunCode = async () => {
     try {
-      const newCode = await generateNewCode();
+      const RunAPI =
+        SelectedProblem === 0
+          ? "http://127.0.0.1:3000/docker/editor/run"
+          : "http://127.0.0.1:3000/docker/run";
 
-      const response = await fetch("http://127.0.0.1:3000/run", {
+      const newCode = SelectedProblem == 0 ? code : await generateNewCode();
+
+      const response = await fetch(RunAPI, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,6 +139,7 @@ const CodeSection = () => {
           language,
           code: newCode,
           input: testCaseInput,
+          SelectedProblem: SelectedProblem,
         }),
       });
       logEvent(
@@ -139,19 +147,32 @@ const CodeSection = () => {
         { status: response.status },
         LogLevel.INFO
       );
-      if (response) {
-        const data = await response.json();
 
-        const [expectedOutput, userOutput] = data.output.split("---SPLIT---");
+      const data = await response.json();
+      if (data.ok) {
+        if (SelectedProblem === 0) {
+          setExpectedResponseUpdate(data.output);
+          logEvent("Code executed successfully", { data }, LogLevel.INFO);
+        } else {
+          const [userOutput, expectedOutput] = data.output.split("---SPLIT---");
 
-        setExpectedResponseUpdate(expectedOutput.trim());
-        setResponseUpdate(userOutput.trim());
-        logEvent("Code executed successfully", { data }, LogLevel.INFO);
+          setExpectedResponseUpdate(expectedOutput.trim());
+          setResponseUpdate(userOutput.trim());
+
+          logEvent("Code executed successfully", { data }, LogLevel.INFO);
+        }
       } else {
+        const [beforeWarning, afterWarning] =
+          data.output.split(":\n/app/main.cpp:");
+        const [beforeTerminate, afterTerminate] =
+          afterWarning.split("terminate");
+        setCodeError(beforeTerminate);
         logEvent("Response was not OK", LogLevel.WARN);
       }
       // setResonseUpdate(stringifiedData);
     } catch (error) {
+      console.log(error);
+
       logEvent("Code execution error", { error }, LogLevel.ERROR);
     }
     setISsubmit(false);
@@ -189,34 +210,25 @@ const CodeSection = () => {
     } else {
       setCode(data.boilerplateUser[language]);
     }
+
     setISsubmit(false);
   };
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = parseInt(e.target.value);
-    console.log(selected);
+    if (selected === 0) {
+      setCode(languageOptions[language].value); // Reset code to the default value for the selected language
+    } else {
+      setCode(data.boilerplateUser[language]); // Set the appropriate boilerplate code based on the problem
+    }
     setSelectedProblem(selected);
   };
-
-  useEffect(() => {
-    if (SelectedProblem === 0) {
-      setCppValue(languageOptions.cpp.value);
-      setJavaValue(languageOptions.java.value);
-      setPythonValue(languageOptions.python.value);
-      setCode(languageOptions[language].value);
-    } else {
-      setCppValue(data.boilerplateUser.cpp);
-      setJavaValue(data.boilerplateUser.java);
-      setPythonValue(data.boilerplateUser.python);
-    }
-    setCode(data.boilerplateUser[language]);
-  }, [SelectedProblem]);
 
   const handleSubmitCode = async () => {
     try {
       const newCode = await generateNewCode();
 
-      const response = await fetch("http://127.0.0.1:3000/submit", {
+      const response = await fetch("http://127.0.0.1:3000/docker/sumbit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -373,6 +385,18 @@ const CodeSection = () => {
                     {expectedResponseUpdate}
                   </pre>
                 </div>
+              </div>
+            )}
+            {codeError && (
+              <div>
+                <div className="text-[#a03112]">Error</div>
+                <div>{codeError}</div>
+              </div>
+            )}
+            {expectedResponseUpdate && responseUpdate === "" && (
+              <div className="flex flex-col gap-3">
+                <div className="text-[#00e636]">output</div>
+                <div>{expectedResponseUpdate}</div>
               </div>
             )}
           </div>
