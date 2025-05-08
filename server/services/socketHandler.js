@@ -1,8 +1,8 @@
 // services/socketHandler.js
 
-const { Server } = require("socket.io");
+import { Server } from "socket.io";
 
-module.exports = function (server) {
+export default function (server) {
   const io = new Server(server, {
     cors: {
       origin: "http://localhost:5000", // Match frontend port
@@ -39,4 +39,4 @@ module.exports = function (server) {
       // Handle user disconnect
     });
   });
-};
+}

@@ -1,7 +1,9 @@
-const express = require("express");
+// routes/docker/editorRoute.js
+import express from "express";
+import { handleEditor } from "../../controllers/docker/editor.js";
+
 const router = express.Router();
-const { handleEditor } = require("../../controllers/docker/editor");
 
 router.post("/", handleEditor);
 
-module.exports = router;
+export default router;

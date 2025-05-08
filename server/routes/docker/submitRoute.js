@@ -1,8 +1,9 @@
-const express = require("express");
+// routes/docker/submitRoute.js
+import express from "express";
+import { handleSubmit } from "../../controllers/docker/submit.js";
 
 const router = express.Router();
-const { handleSubmit } = require("../../controllers/docker/submit");
 
 router.post("/", handleSubmit);
 
-module.exports = router;
+export default router;

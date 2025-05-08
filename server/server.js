@@ -1,10 +1,9 @@
-const express = require("express");
+import express from "express";
 const app = express();
 app.use(express.json());
-const mongoose = require("mongoose");
 
 //cors
-const cors = require("cors");
+import cors from "cors";
 app.use(
   cors({
     origin: "http://localhost:5000", // Match your frontend port
@@ -15,20 +14,23 @@ app.use(
 
 app.options("/run", cors()); // Handle preflight explicitly
 
-require("dotenv").config({ path: "../.env" });
+import dotenv from "dotenv";
+
+dotenv.config({ path: "../.env" });
 
 //config
-require("./config/database");
-const morganMiddleware = require("./config/morganlogger");
+import "./config/database.js";
+import morganMiddleware from "./config/morganlogger.js";
 app.use(morganMiddleware);
 
 //services
-const server = require("http").createServer(app);
-const setupSocket = require("./services/socketHandler");
+import { createServer } from "http";
+import setupSocket from "./services/socketHandler.js";
+const server = createServer(app);
 setupSocket(server);
 
 //routes
-const routes = require("./routes");
+import routes from "./routes/index.js";
 app.use("/", routes);
 
 app.get("/", (req, res) => {

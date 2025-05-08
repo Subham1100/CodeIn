@@ -1,7 +1,10 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const userRoutes = require("./user");
+import userRoutes from "./user.js";
 router.use(userRoutes);
 
-module.exports = router;
+import roomRoutes from "./room.js";
+router.use("/api/room", roomRoutes);
+
+export default router;

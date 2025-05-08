@@ -1,15 +1,10 @@
-const logger = require("./logger");
-const morgan = require("morgan");
+import logger from "./logger.js"; // Import logger
+import morgan from "morgan"; // Import morgan
 
-//logger
-
-// logger.info("This is an info message");
-// logger.error("This is an error message");
-// logger.warn("This is a warning message");
-// logger.debug("This is a debug message");
-
+// morgan format
 const morganFormat = ":method :url :status :response-time ms";
 
+// Create morgan middleware with a custom stream
 const morganMiddleware = morgan(morganFormat, {
   stream: {
     write: (message) => {
@@ -19,9 +14,10 @@ const morganMiddleware = morgan(morganFormat, {
         status: message.split(" ")[2],
         responseTime: message.split(" ")[3],
       };
-      logger.info(JSON.stringify(logObject));
+      logger.info(JSON.stringify(logObject)); // Log the message
     },
   },
 });
 
-module.exports = morganMiddleware;
+// Export the morgan middleware
+export default morganMiddleware;

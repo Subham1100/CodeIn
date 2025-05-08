@@ -1,8 +1,9 @@
-const express = require("express");
+// routes/docker/runRoute.js
+import express from "express";
+import { handleRun } from "../../controllers/docker/run.js";
 
 const router = express.Router();
-const { handleRun } = require("../../controllers/docker/run");
 
 router.post("/", handleRun);
 
-module.exports = router;
+export default router;

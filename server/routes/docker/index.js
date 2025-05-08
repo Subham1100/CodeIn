@@ -1,14 +1,13 @@
 // routes/docker/dockerRoutes.js
-const express = require("express");
+import express from "express";
+import dockerRunRoute from "./runRoute.js";
+import dockerSubmitRoute from "./submitRoute.js";
+import dockerEditorRoute from "./editorRoute.js";
+
 const router = express.Router();
 
-const dockerRunRoute = require("./runRoute");
 router.use("/run", dockerRunRoute);
-
-const dockerSubmitRoute = require("./submitRoute");
 router.use("/submit", dockerSubmitRoute);
-
-const dockerEditorRoute = require("./editorRoute");
 router.use("/editor/run", dockerEditorRoute);
 
-module.exports = router;
+export default router;

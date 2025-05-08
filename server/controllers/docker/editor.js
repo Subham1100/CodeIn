@@ -1,6 +1,7 @@
-const fs = require("fs");
-const path = require("path");
-const { exec } = require("child_process");
+import fs from "fs";
+import path from "path";
+import { exec } from "child_process";
+import os from "os";
 function handleEditor(req, res) {
   const { code, language, input, SelectedProblem = "" } = req.body;
 
@@ -9,7 +10,7 @@ function handleEditor(req, res) {
     java: "Main.java",
     python: "main.py",
   };
-  const os = require("os");
+
   const fileName = fileNames[language];
   const tempDir = path.join(os.tmpdir(), "whiteboard-runner");
   const filePath = path.join(tempDir, fileName);
@@ -55,4 +56,4 @@ function handleEditor(req, res) {
   });
 }
 
-module.exports = { handleEditor };
+export { handleEditor };

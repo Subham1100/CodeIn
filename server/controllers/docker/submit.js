@@ -1,7 +1,8 @@
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-const { exec } = require("child_process");
+import fs from "fs";
+import path from "path";
+import { exec } from "child_process";
+import os from "os";
+
 function handleSubmit(req, res) {
   const { code, language, input = "" } = req.body;
 
@@ -10,7 +11,6 @@ function handleSubmit(req, res) {
     java: "Main.java",
     python: "main.py",
   };
-  const os = require("os");
 
   const fileName = fileNames[language];
   const tempDir = path.join(os.tmpdir(), "whiteboard-runner");
@@ -56,4 +56,4 @@ function handleSubmit(req, res) {
   });
 }
 
-module.exports = { handleSubmit };
+export { handleSubmit };

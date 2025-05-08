@@ -1,8 +1,27 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const { handleUserCreation } = require("../../controllers/database/user");
+import {
+  handleDelete,
+  handleLogin,
+  handleLogout,
+  handleUserProfile,
+  handleProfileUpdate,
+  handleRegister,
+} from "../../controllers/database/user/index.js"; // Make sure to include .js extension if using ESM
 
-router.post("/api/users", handleUserCreation);
+// POST requests
+router.post("/api/register", handleRegister);
+router.post("/api/login", handleLogin);
+router.post("/api/logout", handleLogout);
 
-module.exports = router;
+// GET requests
+router.get("/api/user/profile", handleUserProfile);
+
+// PUT requests
+router.put("/api/user/profile/update", handleProfileUpdate);
+
+// DELETE requests
+router.post("/api/delete", handleDelete);
+
+export default router; // Export the router using ESM syntax
