@@ -1,7 +1,7 @@
 import User from "../../../models/user.js";
 
 export default async function getUserProfile(req, res) {
-  const { userId } = req.params;
+  const { userId } = req.body;
 
   if (!userId) {
     return res.status(400).json({ ok: false, message: "User ID is required." });

@@ -11,17 +11,17 @@ import {
 } from "../../controllers/database/user/index.js"; // Make sure to include .js extension if using ESM
 
 // POST requests
-router.post("/api/register", handleRegister);
-router.post("/api/login", handleLogin);
-router.post("/api/logout", handleLogout);
+router.post("/register", handleRegister);
+router.post("/login", handleLogin);
+router.post("/logout", handleLogout);
 
 // GET requests
-router.get("/api/user/profile", handleUserProfile);
+router.get("/profile", handleUserProfile);
 
 // PUT requests
-router.put("/api/user/profile/update", handleProfileUpdate);
+router.put("/profile/update", handleProfileUpdate);
 
 // DELETE requests
-router.post("/api/delete", handleDelete);
+router.delete("/delete", handleDelete);
 
 export default router; // Export the router using ESM syntax

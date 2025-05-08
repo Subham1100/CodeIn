@@ -1,9 +1,9 @@
 import User from "../../../models/user.js";
+import bcrypt from "bcrypt";
 
 export default async function updateUserProfile(req, res) {
   const hashsalt = 10;
-  const { userId } = req.params;
-  const { firstName, email, password } = req.body;
+  const { firstName, email, password, userId } = req.body;
 
   if (!userId) {
     return res.status(400).json({ ok: false, message: "User ID is required." });
