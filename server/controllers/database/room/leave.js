@@ -15,20 +15,27 @@ export default async function (req, res) {
         .json({ message: "roomId and currUser are required" });
     }
 
-    const room = await Room.findById(roomId);
+    const room = await Room.findOne({ roomId });
 
     if (!room) {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    if (!room.members.includes(currUser)) {
+    if (
+      !room.members.some(
+        (member) => member.user.toString() === currUser.toString()
+      )
+    ) {
       return res.status(400).json({ message: "User is not in the room" });
     }
 
     if (room.host === currUser) {
+      room.members = room.members.filter(
+        (member) => member.user.toString() !== currUser.toString()
+      );
       if (room.members.length > 0) {
         // Promote the first remaining member to host
-        room.host = room.members[0];
+        room.host = room.members[0].user;
         await room.save();
         return res
           .status(200)
@@ -42,7 +49,9 @@ export default async function (req, res) {
       }
     } else {
       // Remove user from room members
-      room.members = room.members.filter((member) => member !== currUser);
+      room.members = room.members.filter(
+        (member) => member.user.toString() !== currUser.toString()
+      );
       await room.save();
       return res.status(200).json({ message: "Left room successfully", room });
     }

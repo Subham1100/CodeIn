@@ -13,7 +13,7 @@ router.post("/create", createRoom);
 router.post("/join", joinRoom);
 router.post("/leave", leaveRoom);
 router.get("/rooms", getRooms);
-router.put("/user/:id/access", updateMemberAccess);
-router.delete("/members/:userid", kickMember);
+router.put("/access", updateMemberAccess);
+router.delete("/kick", kickMember);
 
 export default router;

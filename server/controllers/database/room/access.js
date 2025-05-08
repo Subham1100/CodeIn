@@ -7,29 +7,34 @@ import Room from "../../../models/room.js";
  */
 export default async function (req, res) {
   try {
-    const memberId = req.params.id;
-    const { roomId, newAccess } = req.body;
+    const { roomId, newAccess, currUser } = req.body;
 
-    if (!roomId || !newAccess) {
+    if (!roomId || !newAccess || !currUser) {
       return res
         .status(400)
         .json({ message: "roomId and newAccess are required" });
     }
 
-    const room = await Room.findById(roomId);
+    const room = await Room.findOne({ roomId });
 
     if (!room) {
       return res.status(404).json({ message: "Room not found" });
     }
 
     // Assuming members are stored as objects with access roles
-    const member = room.members.find((m) => m.user.toString() === memberId);
+    const member = room.members.find(
+      (m) => m.user.toString() === currUser.toString()
+    );
 
     if (!member) {
       return res.status(404).json({ message: "Member not found in the room" });
     }
+    const validAccess = ["whiteboard", "codeEditor", "giveAccess"];
+    if (!validAccess.includes(newAccess)) {
+      return res.status(400).json({ message: "Invalid access type" });
+    }
 
-    member.accessTo[newAccess] = true;
+    member.accessTo[newAccess] = !member.accessTo[newAccess];
 
     await room.save();
 
