@@ -6,18 +6,19 @@ import Feature from "../components/feature";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const goToRooms = () => {
+
+  const handleGetStarted = () => {
     try {
       logEvent("CTA_Clicked", {
         location: "Hero Section",
         button: "Get Started",
       });
-      navigate("/rooms");
-      logEvent("Navigation_Success", { to: "/rooms" });
+      navigate("/auth");
+      logEvent("Navigation_Success", { to: "/auth" });
     } catch (error) {
       logEvent(
         "Navigation_Failure",
-        { to: "/rooms", error: getErrorMessage(error) },
+        { to: "/auth", error: getErrorMessage(error) },
         LogLevel.ERROR
       );
     }
@@ -56,7 +57,7 @@ const HomePage = () => {
           <button
             id="hero_button_cta"
             className="bg-black p-2 rounded-xl shadow-black shadow-md"
-            onClick={goToRooms}
+            onClick={handleGetStarted}
           >
             <p className="text-button text-white font-sans">Get Started</p>
           </button>

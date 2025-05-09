@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSocket } from "../hooks/socketContext.tsx";
 import { logEvent, LogLevel } from "../utils/logger";
+import axios from "axios";
 
 import Feature from "../components/feature";
 
@@ -96,6 +97,41 @@ const Room = () => {
     );
     navigate(`/rooms/${RoomId}`);
   };
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      // Make the authenticated request
+      const authenticationHeader = {
+        Authorization: token,
+      };
+
+      axios
+        .get("http://localhost:3000/database/api/user/profile/", {
+          headers: authenticationHeader,
+        })
+        .then((response) => {
+          console.log("User profile data:", response.data.user);
+          setUser(response.data.user);
+          setIsAuthenticated(true);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile:", error);
+          setIsAuthenticated(false);
+        });
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  if (!isAuthenticated) {
+    return <div style={{ backgroundColor: "white", height: "100vh" }}></div>;
+  }
+
   return (
     <div className="px-[100px] py-[50px] pb-[100px] flex flex-col gap-[50px] animate-flip-vertical animate-slide-in bg-[#F0E0B9] ">
       <Feature

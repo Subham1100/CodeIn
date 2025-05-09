@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 
 export default async function updateUserProfile(req, res) {
   const hashsalt = 10;
-  const { firstName, email, password, userId } = req.body;
+  const { password } = req.body;
+  const userId = req.user._id;
 
   if (!userId) {
     return res.status(400).json({ ok: false, message: "User ID is required." });
@@ -18,8 +19,6 @@ export default async function updateUserProfile(req, res) {
     }
 
     // Update user fields
-    if (firstName) user.firstName = firstName;
-    if (email) user.email = email;
     if (password) {
       user.password = await bcrypt.hash(password, hashsalt); // hash the new password
     }

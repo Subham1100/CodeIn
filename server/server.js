@@ -8,7 +8,7 @@ app.use(
   cors({
     origin: "http://localhost:5000", // Match your frontend port
     methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -21,7 +21,10 @@ dotenv.config({ path: "../.env" });
 //config
 import "./config/database.js";
 import morganMiddleware from "./config/morganlogger.js";
+import configurePassport from "./config/passport.js";
 app.use(morganMiddleware);
+configurePassport(passport);
+app.use(passport.initialize());
 
 //services
 import { createServer } from "http";
@@ -31,6 +34,7 @@ setupSocket(server);
 
 //routes
 import routes from "./routes/index.js";
+import passport from "passport";
 app.use("/", routes);
 
 app.get("/", (req, res) => {

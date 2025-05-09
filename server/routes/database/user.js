@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-
+import passport from "passport";
 import {
   handleDelete,
   handleLogin,
@@ -16,10 +16,18 @@ router.post("/login", handleLogin);
 router.post("/logout", handleLogout);
 
 // GET requests
-router.get("/profile", handleUserProfile);
+router.get(
+  "/profile",
+  passport.authenticate("jwt", { session: false }),
+  handleUserProfile
+);
 
 // PUT requests
-router.put("/profile/update", handleProfileUpdate);
+router.put(
+  "/profile/update",
+  passport.authenticate("jwt", { session: false }),
+  handleProfileUpdate
+);
 
 // DELETE requests
 router.delete("/delete", handleDelete);
