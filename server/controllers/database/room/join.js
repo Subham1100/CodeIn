@@ -7,7 +7,8 @@ import Room from "../../../models/room.js";
  */
 export default async function (req, res) {
   try {
-    const { roomId, currUser } = req.body;
+    const { roomId } = req.body;
+    const currUser = req.user._id;
 
     if (!roomId || !currUser) {
       return res
@@ -35,7 +36,7 @@ export default async function (req, res) {
       await room.save();
       return res
         .status(200)
-        .json({ message: "Joined room successfully", room });
+        .json({ message: "Joined room successfully", roomId: room.roomId });
     }
   } catch (err) {
     console.error("Error joining room:", err);

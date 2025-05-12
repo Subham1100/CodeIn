@@ -4,3 +4,6 @@ export { default as leaveRoom } from "./leave.js";
 export { default as getRooms } from "./rooms.js";
 export { default as kickMember } from "./kick.js";
 export { default as updateMemberAccess } from "./access.js";
+export { default as getRoomMembers } from "./members.js";
+export { default as getRoomMembersAccess } from "./getAccess.js";
+export { default as getRoomMembersPermission } from "./getPermission.js";

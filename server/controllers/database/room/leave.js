@@ -7,7 +7,8 @@ import Room from "../../../models/room.js";
  */
 export default async function (req, res) {
   try {
-    const { roomId, currUser } = req.body;
+    const { roomId } = req.body;
+    const currUser = req.user._id;
 
     if (!roomId || !currUser) {
       return res
@@ -29,7 +30,7 @@ export default async function (req, res) {
       return res.status(400).json({ message: "User is not in the room" });
     }
 
-    if (room.host === currUser) {
+    if (room.host.toString() === currUser.toString()) {
       room.members = room.members.filter(
         (member) => member.user.toString() !== currUser.toString()
       );

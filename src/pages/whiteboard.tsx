@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useSocket } from "../hooks/socketContext";
 import { logEvent, LogLevel } from "../utils/logger";
 import Canvas from "./canvas";
+import axios from "axios";
 
 interface DrawElement {
   type: string;
@@ -13,13 +14,20 @@ interface DrawElement {
   width: number;
   height: number;
 }
+type AccessOptions = {
+  whiteboard: boolean;
+  codeEditor: boolean;
+};
 
 const Whiteboard = () => {
   const [getTool, setTool] = useState<string>("pencil");
   const [getColor, setColor] = useState<string>("black");
   const [getHistory, setHistory] = useState<DrawElement[]>([]);
   const [getElements, setElements] = useState<DrawElement[]>([]);
-
+  const [accessData, setAccessData] = useState<AccessOptions>({
+    whiteboard: false,
+    codeEditor: false,
+  });
   const canvasRef = useRef<HTMLCanvasElement>(null!);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null!);
 
@@ -237,6 +245,40 @@ const Whiteboard = () => {
     }
   };
 
+  useEffect(() => {
+    const updateOptions = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/database/api/room/get-permission`,
+          {
+            params: {
+              roomId: roomId,
+            },
+            headers: authenticationHeader,
+          }
+        );
+        setAccessData(response.data.permissions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    updateOptions();
+
+    socket.on("access-updated", updateOptions);
+  }, []);
+
+  useEffect(() => {
+    if (accessData.whiteboard === false) {
+      setTool("");
+    } else {
+      setTool("pencil");
+    }
+  }, [accessData]);
+
   return (
     <div className="overflow-scroll h-full">
       <div>Whiteboard</div>
@@ -252,6 +294,7 @@ const Whiteboard = () => {
             value="pencil"
             defaultChecked
             onChange={(e) => setTool(e.target.value)}
+            disabled={accessData?.whiteboard === false}
           />
 
           <label htmlFor="line">line</label>
@@ -262,6 +305,7 @@ const Whiteboard = () => {
             value="line"
             checked={getTool === "line"}
             onChange={(e) => setTool(e.target.value)}
+            disabled={accessData?.whiteboard === false}
           />
 
           <label htmlFor="array">Array</label>
@@ -272,6 +316,7 @@ const Whiteboard = () => {
             value="array"
             checked={getTool === "array"}
             onChange={(e) => setTool(e.target.value)}
+            disabled={accessData?.whiteboard === false}
           />
 
           <label htmlFor="graph">Graph</label>
@@ -282,6 +327,7 @@ const Whiteboard = () => {
             value="graph"
             checked={getTool === "graph"}
             onChange={(e) => setTool(e.target.value)}
+            disabled={accessData?.whiteboard === false}
           />
 
           <label htmlFor="rectangle">Rectangle</label>
@@ -292,6 +338,7 @@ const Whiteboard = () => {
             value="rectangle"
             checked={getTool === "rectangle"}
             onChange={(e) => setTool(e.target.value)}
+            disabled={accessData?.whiteboard === false}
           />
           <label htmlFor="circle">circle</label>
           <input
@@ -301,6 +348,7 @@ const Whiteboard = () => {
             value="circle"
             checked={getTool === "circle"}
             onChange={(e) => setTool(e.target.value)}
+            disabled={accessData?.whiteboard === false}
           />
 
           <p>Selected Tool: {getTool}</p>

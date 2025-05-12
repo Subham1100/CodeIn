@@ -7,7 +7,7 @@ import cors from "cors";
 app.use(
   cors({
     origin: "http://localhost:5000", // Match your frontend port
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );

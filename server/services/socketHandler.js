@@ -1,6 +1,7 @@
 // services/socketHandler.js
 
 import { Server } from "socket.io";
+import axios from "axios";
 
 export default function (server) {
   const io = new Server(server, {
@@ -11,9 +12,46 @@ export default function (server) {
   });
 
   io.on("connection", (socket) => {
-    socket.on("joinRoom", (data) => {
-      const { name, userId, roomId, host, presenter } = data;
-      socket.join(roomId);
+    socket.on("createRoom", async (data, callback) => {
+      const { token } = data;
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/database/api/room/create/",
+          {},
+          {
+            headers: {
+              Authorization: token,
+            },
+          }
+        );
+        const roomId = response.data.roomId;
+        socket.join(roomId);
+        callback({ status: "ok", roomId });
+      } catch (error) {
+        console.error("Error creating room:", error.message);
+        callback({ status: "error", error: "Failed to create or join room" });
+      }
+    });
+
+    socket.on("joinRoom", async (data, callback) => {
+      const { token, roomId } = data;
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/database/api/room/join/",
+          { roomId: roomId },
+          {
+            headers: {
+              Authorization: token,
+            },
+          }
+        );
+        socket.join(roomId);
+        callback({ status: "ok", roomId });
+      } catch (error) {
+        console.error("Error creating room:", error.message);
+        callback({ status: "error", error: "Failed to create or join room" });
+      }
+      io.to(roomId).emit("members-updated");
     });
 
     socket.on("drawElement", (newElement) => {
@@ -35,8 +73,35 @@ export default function (server) {
       socket.broadcast.emit("updateRedoCanvas", { type: "redoCanvas" });
     });
 
+    socket.on("leave", async (data, callback) => {
+      const { token, roomId } = data;
+      try {
+        axios.post(
+          "http://localhost:3000/database/api/room/leave/",
+          { roomId: roomId },
+          {
+            headers: {
+              Authorization: token,
+            },
+          }
+        );
+
+        callback({ status: "ok" });
+        io.to(roomId).emit("members-updated");
+      } catch {
+        console.error("Error creating room:", error.message);
+      }
+    });
+    socket.on("member-kicked", (data) => {
+      const { roomId } = data;
+      io.to(roomId).emit("members-updated");
+    });
+    socket.on("access-changed", (data) => {
+      const { roomId } = data;
+      io.to(roomId).emit("access-updated");
+    });
     socket.on("disconnect", () => {
-      // Handle user disconnect
+      console.log("User disconnected"); // Optionally do cleanup here
     });
   });
 }

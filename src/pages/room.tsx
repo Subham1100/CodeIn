@@ -17,64 +17,32 @@ const Room = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const roomIds: number[] = [];
-
-  const generateRoomCode = (): number => {
-    const min = 1000;
-    const max = 9999;
-    let RoomId: number;
-
-    do {
-      RoomId = Math.floor(Math.random() * (max - min + 1)) + min;
-    } while (roomIds.includes(RoomId));
-
-    roomIds.push(RoomId);
-    return RoomId;
-  };
-
-  const generateUuid = (): string => {
-    const randomLetter = String.fromCharCode(
-      97 + Math.floor(Math.random() * 26)
-    ); // 'a' to 'z'
-    const randomNumber = Math.floor(1 + Math.random() * 99999999); // 1 to 100000000
-    return `${randomLetter}${randomNumber}`;
-  };
-
   const handleCreate = () => {
-    const RoomId = generateRoomCode();
-    const uuid = generateUuid();
+    const token = localStorage.getItem("token");
     const roomData = {
-      name: placeholderName,
-      userId: uuid,
-      roomId: RoomId,
-      host: true,
-      presenter: false,
+      token: token,
     };
     socket.emit(
-      "joinRoom",
+      "createRoom",
       roomData,
-      (response: { status: string; error?: string }) => {
+      (response: { status: string; roomId?: string; error?: string }) => {
         if (response.status === "ok") {
           logEvent("Successfully joined room", roomData, LogLevel.INFO);
-          navigate(`/rooms/${RoomId}`);
+          navigate(`/rooms/${response.roomId}`);
         } else {
           logEvent("Failed to join room", response.error, LogLevel.ERROR);
           alert("Failed to join room: " + response.error); // optional: user feedback
         }
       }
     );
-    navigate(`/rooms/${RoomId}`);
   };
 
   const handleJoin = () => {
+    const token = localStorage.getItem("token");
     const RoomId = placeholderRoomId;
-    const uuid = generateUuid();
     const roomData = {
-      name: placeholderName,
-      userId: uuid,
+      token: token,
       roomId: RoomId,
-      host: true,
-      presenter: false,
     };
     logEvent("Joining Room", roomData, LogLevel.INFO);
 
@@ -95,7 +63,6 @@ const Room = () => {
         }
       }
     );
-    navigate(`/rooms/${RoomId}`);
   };
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);

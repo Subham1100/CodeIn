@@ -1,4 +1,5 @@
 import Room from "../../../models/room.js";
+import User from "../../../models/user.js";
 
 /**
  * @desc    Kick a member from a room
@@ -7,13 +8,18 @@ import Room from "../../../models/room.js";
  */
 export default async function (req, res) {
   try {
-    const { roomId, currUser, userId } = req.body;
-
-    if ((!currUser || !roomId, !userId)) {
+    const { roomId, username } = req.body;
+    const currUser = req.user._id;
+    if (!currUser || !roomId || !username) {
       return res
         .status(400)
         .json({ message: "currUser and roomId are required" });
     }
+    const targetUser = await User.findOne({ username });
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const userId = targetUser._id;
 
     const room = await Room.findOne({ roomId });
 
@@ -21,8 +27,8 @@ export default async function (req, res) {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    if (room.host.toString() !== currUser) {
-      return res.status(404).json({ message: "not authorized" });
+    if (room.host.toString() !== currUser.toString()) {
+      return res.status(403).json({ message: "not authorized" });
     }
 
     if (
