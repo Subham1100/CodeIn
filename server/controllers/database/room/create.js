@@ -36,6 +36,7 @@ export default async function (req, res) {
             whiteboard: true,
             codeEditor: true,
             giveAccess: true,
+            codeEditorOptions: true,
           },
         },
       ],

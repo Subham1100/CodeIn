@@ -279,6 +279,89 @@ const Whiteboard = () => {
     }
   }, [accessData]);
 
+  useEffect(() => {
+    const sendWhiteboardElements = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+
+      try {
+        const response = await axios.put(
+          `http://localhost:3000/database/api/room/whiteboardElements`,
+          { roomId: roomId, whiteboardElements: getElements },
+          {
+            headers: authenticationHeader,
+          }
+        );
+        return response.data;
+      } catch (error) {}
+    };
+    if (getElements.length > 0) sendWhiteboardElements();
+  }, [getElements]);
+
+  useEffect(() => {
+    const sendWhiteboardHistory = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.put(
+          `http://localhost:3000/database/api/room/whiteboardHistory`,
+          { roomId: roomId, whiteboardHistory: getHistory },
+          {
+            headers: authenticationHeader,
+          }
+        );
+        return response.data;
+      } catch (error) {}
+    };
+    if (getHistory.length > 0) sendWhiteboardHistory();
+  }, [getHistory]);
+
+  useEffect(() => {
+    const getWhiteboardHistory = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/database/api/room/whiteboardHistory`,
+          {
+            headers: authenticationHeader,
+            params: {
+              roomId: roomId,
+            },
+          }
+        );
+        setHistory(response.data.whiteboardHistory);
+      } catch (error) {}
+    };
+    const getWhiteboardElements = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/database/api/room/whiteboardElements`,
+          {
+            headers: authenticationHeader,
+            params: {
+              roomId: roomId,
+            },
+          }
+        );
+        setElements(response.data.whiteboardElements);
+      } catch (error) {}
+    };
+
+    getWhiteboardHistory();
+    getWhiteboardElements();
+  }, []);
+
   return (
     <div className="overflow-scroll h-full">
       <div>Whiteboard</div>

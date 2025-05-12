@@ -7,6 +7,7 @@ import { useSocket } from "../hooks/socketContext.tsx";
 type AccessOptions = {
   whiteboard: boolean;
   codeEditor: boolean;
+  codeEditorOptions: boolean;
 };
 
 type Props = {
@@ -21,6 +22,7 @@ const MemberDropdown = ({ member, accessData }: Props) => {
   const [options, setOptions] = useState({
     whiteboard: accessData[member].whiteboard,
     codeEditor: accessData[member].codeEditor,
+    codeEditorOptions: accessData[member].codeEditorOptions,
   });
   const { roomId } = useParams();
 
@@ -98,6 +100,14 @@ const MemberDropdown = ({ member, accessData }: Props) => {
               onChange={() => toggleOption("codeEditor")}
             />
             Code Editor
+          </label>
+          <label className="flex items-center gap-2 mb-2 text-sm">
+            <input
+              type="checkbox"
+              checked={options.codeEditorOptions}
+              onChange={() => toggleOption("codeEditorOptions")}
+            />
+            Code Editor Options
           </label>
         </div>
       )}

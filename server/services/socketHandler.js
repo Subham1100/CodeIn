@@ -54,7 +54,7 @@ export default function (server) {
       io.to(roomId).emit("members-updated");
     });
 
-    socket.on("drawElement", (newElement) => {
+    socket.on("drawElement", async (newElement) => {
       socket.broadcast.emit("updateCanvas", {
         type: "updateCanvas",
         element: newElement,
@@ -99,6 +99,13 @@ export default function (server) {
     socket.on("access-changed", (data) => {
       const { roomId } = data;
       io.to(roomId).emit("access-updated");
+    });
+
+    socket.on("code-changed", (data) => {
+      socket.broadcast.emit("code-updated", data);
+    });
+    socket.on("code-response-changed", (data) => {
+      socket.broadcast.emit("code-response-updated", data);
     });
     socket.on("disconnect", () => {
       console.log("User disconnected"); // Optionally do cleanup here

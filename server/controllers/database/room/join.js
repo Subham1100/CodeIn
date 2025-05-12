@@ -31,7 +31,12 @@ export default async function (req, res) {
     } else {
       room.members.push({
         user: currUser,
-        accessTo: { whiteboard: false, codeEditor: false, giveAccess: false },
+        accessTo: {
+          whiteboard: false,
+          codeEditor: false,
+          giveAccess: false,
+          codeEditorOptions: false,
+        },
       });
       await room.save();
       return res

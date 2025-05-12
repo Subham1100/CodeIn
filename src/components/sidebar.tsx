@@ -10,11 +10,19 @@ interface SidebarProps {
 type AccessOptions = {
   whiteboard: boolean;
   codeEditor: boolean;
+  codeEditorOptions: boolean;
 };
 import axios from "axios";
 import { useSocket } from "../hooks/socketContext.tsx";
 import MemberDropdown from "./memberDropdown.tsx";
-import { Pencil, PencilOff, Keyboard, KeyboardOff } from "lucide-react";
+import {
+  Pencil,
+  PencilOff,
+  Keyboard,
+  KeyboardOff,
+  Save,
+  SaveOff,
+} from "lucide-react";
 
 const Sidebar: React.FC<SidebarProps> = ({
   hostName,
@@ -142,6 +150,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <Keyboard className="w-5 h-5 text-blue-500" />
                   ) : (
                     <KeyboardOff className="w-5 h-5 text-blue-500" />
+                  )}
+                  {accessData[member]?.codeEditorOptions ? (
+                    <Save className="w-5 h-5 text-blue-500" />
+                  ) : (
+                    <SaveOff className="w-5 h-5 text-blue-500" />
                   )}
                 </div>
               )}

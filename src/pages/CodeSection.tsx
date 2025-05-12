@@ -8,9 +8,19 @@ import { cpp } from "@codemirror/lang-cpp";
 import { java } from "@codemirror/lang-java";
 import { python } from "@codemirror/lang-python";
 
+import axios from "axios";
 import { logEvent, LogLevel } from "../utils/logger";
+type AccessOptions = {
+  whiteboard: boolean;
+  codeEditor: boolean;
+  codeEditorOptions: boolean;
+};
+import { useSocket } from "../hooks/socketContext";
+import { useParams } from "react-router-dom";
 
 const CodeSection = () => {
+  const socket = useSocket();
+  const { roomId } = useParams();
   const [cppValue, setCppValue] = useState(
     `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`
   );
@@ -20,7 +30,11 @@ const CodeSection = () => {
   const [pythonValue, setPythonValue] = useState(
     `print("Hello, Python!")\nfor i in range(5):\n    print(i)`
   );
-
+  const [accessData, setAccessData] = useState<AccessOptions>({
+    whiteboard: false,
+    codeEditor: false,
+    codeEditorOptions: false,
+  });
   const languageOptions = {
     cpp: {
       name: "C++",
@@ -60,6 +74,7 @@ const CodeSection = () => {
     const lang = e.target.value as keyof typeof languageOptions;
     setLanguage(lang);
     setCode(languageOptions[lang].value);
+    socket.emit("code-changed", languageOptions[lang].value);
   };
 
   const getLanguageExtension = () => {
@@ -152,13 +167,24 @@ const CodeSection = () => {
       if (data.ok) {
         if (SelectedProblem === 0) {
           setExpectedResponseUpdate(data.output);
+          const socketData = {
+            expectedResponseUpdate: data.output,
+            responseUpdate: "",
+          };
+
+          socket.emit("code-response-changed", socketData);
           logEvent("Code executed successfully", { data }, LogLevel.INFO);
         } else {
           const [userOutput, expectedOutput] = data.output.split("---SPLIT---");
 
           setExpectedResponseUpdate(expectedOutput.trim());
           setResponseUpdate(userOutput.trim());
+          const socketData = {
+            expectedResponseUpdate: expectedOutput.trim(),
+            responseUpdate: userOutput.trim(),
+          };
 
+          socket.emit("code-response-changed", socketData);
           logEvent("Code executed successfully", { data }, LogLevel.INFO);
         }
       } else {
@@ -194,21 +220,27 @@ const CodeSection = () => {
       python: `def twoSum(self, nums: List[int], target: int) -> List[int]:\n\n`,
     },
   };
+
   const handleResetButton = () => {
     if (SelectedProblem == 0) {
-      if (language === "cpp")
-        setCode(
-          `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`
-        );
-      else if (language === "java") {
-        setCode(
-          `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Java!");\n  }\n}`
-        );
+      const languageData = {
+        cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`,
+        java: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Java!");\n  }\n}`,
+        python: `print("Hello, Python!")\nfor i in range(5):\n    print(i)`,
+      };
+      if (language === "cpp") {
+        setCode(languageData.cpp);
+        socket.emit("code-changed", languageData.cpp);
+      } else if (language === "java") {
+        setCode(languageData.java);
+        socket.emit("code-changed", languageData.java);
       } else if (language === "python") {
-        setCode(`print("Hello, Python!")\nfor i in range(5):\n    print(i)`);
+        setCode(languageData.python);
+        socket.emit("code-changed", languageData.python);
       }
     } else {
       setCode(data.boilerplateUser[language]);
+      socket.emit("code-changed", data.boilerplateUser[language]);
     }
 
     setISsubmit(false);
@@ -218,8 +250,10 @@ const CodeSection = () => {
     const selected = parseInt(e.target.value);
     if (selected === 0) {
       setCode(languageOptions[language].value); // Reset code to the default value for the selected language
+      socket.emit("code-changed", languageOptions[language].value);
     } else {
       setCode(data.boilerplateUser[language]); // Set the appropriate boilerplate code based on the problem
+      socket.emit("code-changed", data.boilerplateUser[language]);
     }
     setSelectedProblem(selected);
   };
@@ -251,6 +285,11 @@ const CodeSection = () => {
 
         setExpectedResponseUpdate(expectedOutput.trim());
         setResponseUpdate(userOutput.trim());
+        const socketData = {
+          expectedResponseUpdate: expectedOutput.trim(),
+          responseUpdate: userOutput.trim(),
+        };
+        socket.emit("code-response-changed", socketData);
         setISsubmit(true);
         logEvent("Code executed successfully", { data }, LogLevel.INFO);
       } else {
@@ -261,6 +300,143 @@ const CodeSection = () => {
       logEvent("Code execution error", { error }, LogLevel.ERROR);
     }
   };
+
+  useEffect(() => {
+    const updateOptions = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/database/api/room/get-permission`,
+          {
+            params: {
+              roomId: roomId,
+            },
+            headers: authenticationHeader,
+          }
+        );
+        setAccessData(response.data.permissions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    updateOptions();
+
+    socket.on("access-updated", updateOptions);
+  }, []);
+
+  useEffect(() => {
+    console.log(accessData);
+  }, [accessData]);
+
+  useEffect(() => {
+    socket.on("code-updated", (response) => {
+      setCode(response);
+    });
+    socket.on("code-response-updated", (response) => {
+      setResponseUpdate(response.responseUpdate);
+      setExpectedResponseUpdate(response.expectedResponseUpdate);
+      console.log(response);
+    });
+  }, []);
+
+  const handelCodeChange = (value: string) => {
+    setters[language](value);
+    setCode(value);
+    socket.emit("code-changed", value);
+  };
+
+  const defaultCodes = {
+    cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`,
+    java: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Java!");\n  }\n}`,
+    python: `print("Hello, Python!")\nfor i in range(5):\n    print(i)`,
+  };
+
+  useEffect(() => {
+    const sendRoomCode = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.put(
+          `http://localhost:3000/database/api/room/roomCode`,
+          { roomId: roomId, roomCode: code },
+          {
+            headers: authenticationHeader,
+          }
+        );
+        return response.data;
+      } catch (error) {}
+    };
+    const isDefaultCode = Object.values(defaultCodes).includes(code);
+    if (!isDefaultCode) sendRoomCode();
+  }, [code]);
+
+  useEffect(() => {
+    const getRoomCode = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/database/api/room/roomCode`,
+          {
+            params: {
+              roomId: roomId,
+            },
+            headers: authenticationHeader,
+          }
+        );
+
+        setCode(response.data.roomCode);
+      } catch (error) {}
+    };
+    const getRoomOutput = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/database/api/room/roomOutput`,
+          {
+            params: {
+              roomId: roomId,
+            },
+            headers: authenticationHeader,
+          }
+        );
+        setExpectedResponseUpdate(response.data.roomOutput);
+      } catch (error) {}
+    };
+    getRoomOutput();
+    getRoomCode();
+  }, []);
+
+  useEffect(() => {
+    const sendRoomOutput = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.put(
+          `http://localhost:3000/database/api/room/roomOutput`,
+          { roomId: roomId, roomOutput: expectedResponseUpdate },
+          {
+            headers: authenticationHeader,
+          }
+        );
+        return response.data;
+      } catch (error) {}
+    };
+    if (expectedResponseUpdate !== "") sendRoomOutput();
+  }, [expectedResponseUpdate]);
+
   return (
     <div className="h-screen w-full">
       <PanelGroup
@@ -275,6 +451,7 @@ const CodeSection = () => {
                 className="border rounded px-2 py-1"
                 value={language}
                 onChange={handleLanguageChange}
+                disabled={!accessData.codeEditorOptions}
               >
                 <option value="cpp">C++</option>
                 <option value="java">Java</option>
@@ -283,18 +460,21 @@ const CodeSection = () => {
               <button
                 onClick={handleRunCode}
                 className="bg-blue-500 rounded-xl p-2 px-5"
+                disabled={!accessData.codeEditorOptions}
               >
                 Run
               </button>
               <button
                 onClick={handleSubmitCode}
                 className="bg-blue-500 rounded-xl p-2"
+                disabled={!accessData.codeEditorOptions}
               >
                 Submit
               </button>
               <button
                 onClick={handleResetButton}
                 className="bg-blue-500 rounded-xl p-2"
+                disabled={!accessData.codeEditorOptions}
               >
                 Reset
               </button>
@@ -302,6 +482,7 @@ const CodeSection = () => {
               <select
                 onChange={handleQuestionChange}
                 className="border rounded px-2 py-1 w-full"
+                disabled={!accessData.codeEditorOptions}
               >
                 <option value="" disabled>
                   ----- Select Leetcode Problem -----
@@ -323,11 +504,9 @@ const CodeSection = () => {
               value={code}
               height="500px"
               extensions={[getLanguageExtension()]}
-              onChange={(value) => {
-                setters[language](value);
-                setCode(value);
-              }}
+              onChange={handelCodeChange}
               theme="dark"
+              readOnly={!accessData.codeEditor}
             />
           </div>
         </Panel>
@@ -351,6 +530,7 @@ const CodeSection = () => {
                 name="inputTestCase"
                 className="w-full h-[40px] mr-4 resize bg-[#333333] p-2"
                 onChange={handleChangeTextArea}
+                disabled={!accessData.codeEditorOptions}
               />
             </div>
             {responseUpdate === expectedResponseUpdate &&

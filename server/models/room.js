@@ -1,5 +1,16 @@
 import mongoose from "mongoose";
-import User from "./user.js";
+const whiteboardElementSchema = {
+  type: { type: String, required: true },
+  offsetX: { type: Number, required: true },
+  offsetY: { type: Number, required: true },
+  path: {
+    type: [[Number]], // Array of [number, number]
+    required: true,
+  },
+  stroke: { type: String, required: true },
+  width: { type: Number, required: true },
+  height: { type: Number, required: true },
+};
 
 const roomSchema = new mongoose.Schema(
   {
@@ -29,6 +40,10 @@ const roomSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
           },
+          codeEditorOptions: {
+            type: Boolean,
+            default: false,
+          },
           giveAccess: {
             type: Boolean,
             default: false,
@@ -36,6 +51,16 @@ const roomSchema = new mongoose.Schema(
         },
       },
     ],
+    roomCode: {
+      type: String,
+      default: "",
+    },
+    roomOutput: {
+      type: String,
+      default: "",
+    },
+    whiteboardElements: [whiteboardElementSchema],
+    whiteboardHistory: [whiteboardElementSchema],
   },
   { timestamps: true }
 );

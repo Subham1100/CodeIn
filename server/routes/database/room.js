@@ -11,6 +11,14 @@ import {
   getRoomMembers,
   getRoomMembersAccess,
   getRoomMembersPermission,
+  UpdateRoomCode,
+  UpdateRoomOutput,
+  UpdateWhiteboardElements,
+  GetRoomCode,
+  GetRoomOutput,
+  GetWhiteboardElements,
+  UpdateWhiteboardHistory,
+  GetWhiteboardHistory,
 } from "../../controllers/database/room/index.js";
 
 router.post(
@@ -44,11 +52,53 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   getRoomMembersPermission
 );
+router.get(
+  "/whiteboardHistory",
+  passport.authenticate("jwt", { session: false }),
+  GetWhiteboardHistory
+);
+
+router.get(
+  "/roomCode",
+  passport.authenticate("jwt", { session: false }),
+  GetRoomCode
+);
+router.get(
+  "/roomOutput",
+  passport.authenticate("jwt", { session: false }),
+  GetRoomOutput
+);
+router.get(
+  "/whiteboardElements",
+  passport.authenticate("jwt", { session: false }),
+  GetWhiteboardElements
+);
 router.put(
   "/access",
   passport.authenticate("jwt", { session: false }),
   updateMemberAccess
 );
+router.put(
+  "/roomCode",
+  passport.authenticate("jwt", { session: false }),
+  UpdateRoomCode
+);
+router.put(
+  "/roomOutput",
+  passport.authenticate("jwt", { session: false }),
+  UpdateRoomOutput
+);
+router.put(
+  "/whiteboardElements",
+  passport.authenticate("jwt", { session: false }),
+  UpdateWhiteboardElements
+);
+router.put(
+  "/whiteboardHistory",
+  passport.authenticate("jwt", { session: false }),
+  UpdateWhiteboardHistory
+);
+
 router.delete(
   "/kick",
   passport.authenticate("jwt", { session: false }),

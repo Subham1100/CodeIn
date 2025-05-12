@@ -26,6 +26,7 @@ export default async function (req, res) {
         data = {
           whiteboard: member.accessTo.whiteboard,
           codeEditor: member.accessTo.codeEditor,
+          codeEditorOptions: member.accessTo.codeEditorOptions,
         };
       }
     });

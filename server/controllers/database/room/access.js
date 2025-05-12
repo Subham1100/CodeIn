@@ -40,6 +40,7 @@ export default async function (req, res) {
     // console.log(member);
     member.accessTo["whiteboard"] = newAccess.whiteboard;
     member.accessTo["codeEditor"] = newAccess.codeEditor;
+    member.accessTo["codeEditorOptions"] = newAccess.codeEditorOptions;
     // console.log(member.accessTo["codeEditor"]);
     await room.save();
 
