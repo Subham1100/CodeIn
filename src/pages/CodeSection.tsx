@@ -159,8 +159,8 @@ const CodeSection = () => {
       });
       logEvent(
         "Received response from server",
-        { status: response.status },
-        LogLevel.INFO
+        { status: response.status }
+        // LogLevel.INFO
       );
 
       const data = await response.json();
@@ -189,10 +189,11 @@ const CodeSection = () => {
         }
       } else {
         const [beforeWarning, afterWarning] =
-          data.output.split(":\n/app/main.cpp:");
-        const [beforeTerminate, afterTerminate] =
-          afterWarning.split("terminate");
-        setCodeError(beforeTerminate);
+          data.output.split("/app/main.cpp:");
+
+        const [beforeTerminate, afterTerminate] = afterWarning.split("^\n");
+        setCodeError(data.output);
+
         logEvent("Response was not OK", LogLevel.WARN);
       }
       // setResonseUpdate(stringifiedData);
@@ -327,9 +328,7 @@ const CodeSection = () => {
     socket.on("access-updated", updateOptions);
   }, []);
 
-  useEffect(() => {
-    console.log(accessData);
-  }, [accessData]);
+  useEffect(() => {}, [accessData]);
 
   useEffect(() => {
     socket.on("code-updated", (response) => {
@@ -338,7 +337,6 @@ const CodeSection = () => {
     socket.on("code-response-updated", (response) => {
       setResponseUpdate(response.responseUpdate);
       setExpectedResponseUpdate(response.expectedResponseUpdate);
-      console.log(response);
     });
   }, []);
 
@@ -570,7 +568,15 @@ const CodeSection = () => {
             {codeError && (
               <div>
                 <div className="text-[#a03112]">Error</div>
-                <div>{codeError}</div>
+                <pre
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    color: "white",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  {codeError}
+                </pre>
               </div>
             )}
             {expectedResponseUpdate && responseUpdate === "" && (
