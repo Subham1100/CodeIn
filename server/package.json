@@ -20,6 +20,8 @@
   "homepage": "https://github.com/Subham1100/Whiteboard#readme",
   "dependencies": {
     "axios": "^1.9.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^10.0.0",
     "express": "^5.1.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.0",
@@ -28,7 +30,6 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "socket.io": "^4.8.1",
-    "winston": "^3.17.0",
-    "dotenv": "^10.0.0"
+    "winston": "^3.17.0"
   }
 }
