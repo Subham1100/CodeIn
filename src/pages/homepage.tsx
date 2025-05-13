@@ -32,7 +32,7 @@ const HomePage = () => {
         <h1 className="text-title font-bold font-sans">Whiteboard</h1>
 
         <img
-          src="../../public/images/hero_image.jpg"
+          src="/images/hero_image.jpg"
           alt="Image"
           id="hero_image"
           className=" object-cover rounded-3xl animate-flip-vertical"
@@ -69,17 +69,17 @@ const HomePage = () => {
           className="flex flex-wrap gap-[50px] px-[100px] w-[full] items-center justify-center "
         >
           <img
-            src="../../public/images/twitter.png"
+            src="/images/twitter.png"
             alt="twitter"
             id="social_media_icons"
           />
           <img
-            src="../../public/images/instagram.png"
+            src="/images/instagram.png"
             alt="instagram"
             id="social_media_icons"
           />
           <img
-            src="../../public/images/linkedin.png"
+            src="/images/linkedin.png"
             alt="linkedin"
             id="social_media_icons"
           />
@@ -97,7 +97,7 @@ const HomePage = () => {
         <Feature
           title="AI-Powered Suggestions"
           description="Leverage AI to suggest shapes, diagrams, or text based on user sketches, enhancing brainstorming sessions."
-          image_src="../../public/images/ai-suggestions.avif"
+          image_src="/images/ai-suggestions.avif"
           link=""
           flip={true}
           button_text="Read me"
@@ -105,7 +105,7 @@ const HomePage = () => {
         <Feature
           title="Real-Time Collaborations"
           description="Collaborate with your team in real-time, enabling seamless brainstorming and idea sharing."
-          image_src="../../public//images/collaboration.avif"
+          image_src="/images/collaboration.avif"
           flip={false}
           link=""
           button_text="Read me"
