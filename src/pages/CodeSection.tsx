@@ -370,7 +370,9 @@ const CodeSection = () => {
       } catch (error) {}
     };
     const isDefaultCode = Object.values(defaultCodes).includes(code);
-    if (!isDefaultCode) sendRoomCode();
+    if (!isDefaultCode) {
+      sendRoomCode();
+    }
   }, [code]);
 
   useEffect(() => {
@@ -389,8 +391,7 @@ const CodeSection = () => {
             headers: authenticationHeader,
           }
         );
-
-        setCode(response.data.roomCode);
+        if (response.data.roomCode !== "") setCode(response.data.roomCode);
       } catch (error) {}
     };
     const getRoomOutput = async () => {

@@ -4,15 +4,17 @@ import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 
-// Resolve __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const envPath = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  "../../.env"
+);
 
-// Resolve the path to your public key file
-const privKeyPath = path.resolve(__dirname, "../../../id_rsa_priv.pem");
+dotenv.config({ path: envPath });
 
-const PRIVATE_KEY = fs.readFileSync(privKeyPath);
+// const PRIVATE_KEY = fs.readFileSync(privKeyPath);
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 export default async function handleUserLogin(req, res) {
   const { email, password } = req.body;

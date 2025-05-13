@@ -2,18 +2,18 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
+import dotenv from "dotenv";
 
 import User from "../models/user.js";
+const envPath = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  "../../.env"
+);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config({ path: envPath });
 
-// Resolve the path to your public key file
-const pubKeyPath = path.resolve(__dirname, "../id_rsa_pub.pem");
-
-// Read the public key
-const PUB_KEY = fs.readFileSync(pubKeyPath, "utf8");
-
+const PUB_KEY = process.env.PUB_KEY;
+// console.log(PUB_KEY);
 // JWT strategy options
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
