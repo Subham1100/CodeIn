@@ -1,6 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import "./css/homepage.css";
 import { logEvent, LogLevel } from "../utils/logger";
+import heroImage from "/images/hero_image.jpg";
+import twitterIcon from "/images/twitter.png";
+import instagramIcon from "/images/instagram.png";
+import linkedinIcon from "/images/linkedin.png";
+import youtubeIcon from "/images/youtube.png";
+import aisuggestions from "/images/ai-suggestions.avif";
+import collaborations from "/images/collaboration.avif";
 
 import Feature from "../components/feature";
 
@@ -32,7 +39,7 @@ const HomePage = () => {
         <h1 className="text-title font-bold font-sans">Whiteboard</h1>
 
         <img
-          src="/images/hero_image.jpg"
+          src={heroImage}
           alt="Image"
           id="hero_image"
           className=" object-cover rounded-3xl animate-flip-vertical"
@@ -68,26 +75,10 @@ const HomePage = () => {
           id="social_links"
           className="flex flex-wrap gap-[50px] px-[100px] w-[full] items-center justify-center "
         >
-          <img
-            src="/images/twitter.png"
-            alt="twitter"
-            id="social_media_icons"
-          />
-          <img
-            src="/images/instagram.png"
-            alt="instagram"
-            id="social_media_icons"
-          />
-          <img
-            src="/images/linkedin.png"
-            alt="linkedin"
-            id="social_media_icons"
-          />
-          <img
-            src="../../public/images/youtube.png"
-            alt="youtube"
-            id="social_media_icons"
-          />
+          <img src={twitterIcon} alt="twitter" id="social_media_icons" />
+          <img src={instagramIcon} alt="instagram" id="social_media_icons" />
+          <img src={linkedinIcon} alt="linkedin" id="social_media_icons" />
+          <img src={youtubeIcon} alt="youtube" id="social_media_icons" />
         </div>
       </section>
       <section
@@ -97,7 +88,7 @@ const HomePage = () => {
         <Feature
           title="AI-Powered Suggestions"
           description="Leverage AI to suggest shapes, diagrams, or text based on user sketches, enhancing brainstorming sessions."
-          image_src="/images/ai-suggestions.avif"
+          image_src={aisuggestions}
           link=""
           flip={true}
           button_text="Read me"
@@ -105,7 +96,7 @@ const HomePage = () => {
         <Feature
           title="Real-Time Collaborations"
           description="Collaborate with your team in real-time, enabling seamless brainstorming and idea sharing."
-          image_src="/images/collaboration.avif"
+          image_src={collaborations}
           flip={false}
           link=""
           button_text="Read me"
