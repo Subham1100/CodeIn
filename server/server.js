@@ -46,7 +46,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
-app.options("*", cors());
+// app.options("*", cors());
 app.options("/run", cors()); // Handle preflight explicitly
 
 //config
