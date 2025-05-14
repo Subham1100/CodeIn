@@ -46,8 +46,8 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
-// app.options("*", cors());
-// app.options("/run", cors()); // Handle preflight explicitly
+app.options("*", cors());
+app.options("/run", cors()); // Handle preflight explicitly
 
 //config
 import "./config/database.js";
