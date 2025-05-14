@@ -30,7 +30,7 @@ const auth = () => {
   const handleLogin = () => {
     if (isLoginPage) {
       axios
-        .post("http://localhost:3000/database/api/user/login", {
+        .post(`${import.meta.env.VITE_API_URL}/database/api/user/login`, {
           email: email,
           password: password,
         })
@@ -57,7 +57,7 @@ const auth = () => {
   const handleRegister = () => {
     if (!isLoginPage) {
       axios
-        .post("http://localhost:3000/database/api/user/register", {
+        .post(`${import.meta.env.VITE_API_URL}/database/api/user/register`, {
           username: username,
           email: email,
           password: password,

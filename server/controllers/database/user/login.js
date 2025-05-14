@@ -12,10 +12,12 @@ const envPath = path.resolve(
 );
 
 dotenv.config({ path: envPath });
-
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+// const privKeyPath = path.resolve(__dirname, "../../../id_rsa_priv.pem");
 // const PRIVATE_KEY = fs.readFileSync(privKeyPath);
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
-
+// const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const PRIVATE_KEY = process.env.PRIVATE_KEY?.replace(/\\n/g, "\n");
 export default async function handleUserLogin(req, res) {
   const { email, password } = req.body;
 

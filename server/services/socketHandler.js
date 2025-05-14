@@ -2,11 +2,19 @@
 
 import { Server } from "socket.io";
 import axios from "axios";
+import path from "path";
+import dotenv from "dotenv";
+const envPath = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  "../../.env"
+);
+
+dotenv.config({ path: envPath });
 
 export default function (server) {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5000", // Match frontend port
+      origin: process.env.FRONTEND_URL, // Match frontend port
       methods: ["GET", "POST"],
     },
   });
@@ -16,7 +24,7 @@ export default function (server) {
       const { token } = data;
       try {
         const response = await axios.post(
-          "http://localhost:3000/database/api/room/create/",
+          `${process.env.API_URL}/database/api/room/create/`,
           {},
           {
             headers: {
@@ -37,7 +45,7 @@ export default function (server) {
       const { token, roomId } = data;
       try {
         const response = await axios.post(
-          "http://localhost:3000/database/api/room/join/",
+          `${process.env.API_URL}/database/api/room/join/`,
           { roomId: roomId },
           {
             headers: {
@@ -77,7 +85,7 @@ export default function (server) {
       const { token, roomId } = data;
       try {
         axios.post(
-          "http://localhost:3000/database/api/room/leave/",
+          `${process.env.API_URL}/database/api/room/leave/`,
           { roomId: roomId },
           {
             headers: {

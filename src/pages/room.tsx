@@ -78,7 +78,7 @@ const Room = () => {
       };
 
       axios
-        .get("http://localhost:3000/database/api/user/profile/", {
+        .get(`${import.meta.env.VITE_API_URL}/database/api/user/profile/`, {
           headers: authenticationHeader,
         })
         .then((response) => {

@@ -24,7 +24,7 @@ function handleEditor(req, res) {
   const fileData = fs.readFileSync(filePath, "utf-8");
 
   // Log the file data
-  console.log(fileData);
+
   let dockerCommand = "";
 
   if (language === "cpp") {
@@ -45,7 +45,7 @@ function handleEditor(req, res) {
   exec(dockerCommand, (err, stdout, stderr) => {
     if (err || stderr) {
       // If there is an error, send an error response with status `false`
-      console.log(err);
+      // console.log(err);
       return res.status(500).json({
         ok: false,
         output: stderr || err.message,

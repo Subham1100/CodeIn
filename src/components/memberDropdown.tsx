@@ -49,7 +49,7 @@ const MemberDropdown = ({ member, accessData }: Props) => {
     const updateAccess = async () => {
       try {
         await axios.put(
-          "http://localhost:3000/database/api/room/access",
+          `${import.meta.env.VITE_API_URL}/database/api/room/access`,
           {
             roomId: roomId,
             member,

@@ -140,8 +140,8 @@ const CodeSection = () => {
     try {
       const RunAPI =
         SelectedProblem === 0
-          ? "http://127.0.0.1:3000/docker/editor/run"
-          : "http://127.0.0.1:3000/docker/run";
+          ? `${import.meta.env.VITE_API_URL}/docker/editor/run`
+          : `${import.meta.env.VITE_API_URL}/docker/run`;
 
       const newCode = SelectedProblem == 0 ? code : await generateNewCode();
 
@@ -203,10 +203,11 @@ const CodeSection = () => {
       logEvent("Code execution error", { error }, LogLevel.ERROR);
     }
     setISsubmit(false);
+    setCodeError("");
   };
 
   const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTestCaseInput("1 " + e.target.value);
+    setTestCaseInput(e.target.value);
 
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto"; // reset height
@@ -263,17 +264,20 @@ const CodeSection = () => {
     try {
       const newCode = await generateNewCode();
 
-      const response = await fetch("http://127.0.0.1:3000/docker/sumbit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          language,
-          code: newCode,
-          input: testCaseInput,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/docker/submit`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            language,
+            code: newCode,
+            input: testCaseInput,
+          }),
+        }
+      );
       logEvent(
         "Received response from server",
         { status: response.status },
@@ -310,7 +314,7 @@ const CodeSection = () => {
       };
       try {
         const response = await axios.get(
-          `http://localhost:3000/database/api/room/get-permission`,
+          `${import.meta.env.VITE_API_URL}/database/api/room/get-permission`,
           {
             params: {
               roomId: roomId,
@@ -360,7 +364,7 @@ const CodeSection = () => {
       };
       try {
         const response = await axios.put(
-          `http://localhost:3000/database/api/room/roomCode`,
+          `${import.meta.env.VITE_API_URL}/database/api/room/roomCode`,
           { roomId: roomId, roomCode: code },
           {
             headers: authenticationHeader,
@@ -383,7 +387,7 @@ const CodeSection = () => {
       };
       try {
         const response = await axios.get(
-          `http://localhost:3000/database/api/room/roomCode`,
+          `${import.meta.env.VITE_API_URL}/database/api/room/roomCode`,
           {
             params: {
               roomId: roomId,
@@ -401,7 +405,7 @@ const CodeSection = () => {
       };
       try {
         const response = await axios.get(
-          `http://localhost:3000/database/api/room/roomOutput`,
+          `${import.meta.env.VITE_API_URL}/database/api/room/roomOutput`,
           {
             params: {
               roomId: roomId,
@@ -424,7 +428,7 @@ const CodeSection = () => {
       };
       try {
         const response = await axios.put(
-          `http://localhost:3000/database/api/room/roomOutput`,
+          `${import.meta.env.VITE_API_URL}/database/api/room/roomOutput`,
           { roomId: roomId, roomOutput: expectedResponseUpdate },
           {
             headers: authenticationHeader,

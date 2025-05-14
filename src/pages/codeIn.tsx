@@ -24,7 +24,9 @@ const CodeIn = () => {
     };
 
     const response = await axios.get(
-      `http://localhost:3000/database/api/room/members?roomId=${roomId}`,
+      `${
+        import.meta.env.VITE_API_URL
+      }/database/api/room/members?roomId=${roomId}`,
       {
         headers: authenticationHeader,
       }

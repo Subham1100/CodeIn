@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react";
 import { io, Socket } from "socket.io-client";
 
-const server = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
+const server = import.meta.env.VITE_API_URL;
 
 // Create socket instance
 const socket: Socket = io(server, {

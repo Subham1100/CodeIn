@@ -1,22 +1,26 @@
 import express from "express";
 const app = express();
 app.use(express.json());
+import path from "path";
+import dotenv from "dotenv";
+const envPath = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  "../.env"
+);
+
+dotenv.config({ path: envPath });
 
 //cors
 import cors from "cors";
 app.use(
   cors({
-    origin: "http://localhost:5000", // Match your frontend port
+    origin: process.env.FRONTEND_URL, // Match your frontend port
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.options("/run", cors()); // Handle preflight explicitly
-
-import dotenv from "dotenv";
-
-dotenv.config({ path: "../.env" });
 
 //config
 import "./config/database.js";

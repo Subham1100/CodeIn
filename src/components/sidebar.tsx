@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+
 interface SidebarProps {
   hostName: string;
   members: string[];
@@ -23,6 +24,7 @@ import {
   Save,
   SaveOff,
 } from "lucide-react";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Sidebar: React.FC<SidebarProps> = ({
   hostName,
@@ -60,7 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       Authorization: token,
     };
     axios
-      .delete("http://localhost:3000/database/api/room/kick", {
+      .delete(`${API_URL}/database/api/room/kick`, {
         headers: authenticationHeader,
         data: { username: member, roomId: roomId },
       })
@@ -84,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       };
       try {
         const response = await axios.get(
-          `http://localhost:3000/database/api/room/get-access`,
+          `${API_URL}/database/api/room/get-access`,
           {
             params: {
               roomId: roomId,

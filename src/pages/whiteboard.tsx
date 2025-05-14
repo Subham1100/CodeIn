@@ -253,7 +253,7 @@ const Whiteboard = () => {
       };
       try {
         const response = await axios.get(
-          `http://localhost:3000/database/api/room/get-permission`,
+          `${import.meta.env.VITE_API_URL}/database/api/room/get-permission`,
           {
             params: {
               roomId: roomId,
@@ -288,7 +288,9 @@ const Whiteboard = () => {
 
       try {
         const response = await axios.put(
-          `http://localhost:3000/database/api/room/whiteboardElements`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/database/api/room/whiteboardElements`,
           { roomId: roomId, whiteboardElements: getElements },
           {
             headers: authenticationHeader,
@@ -308,7 +310,7 @@ const Whiteboard = () => {
       };
       try {
         const response = await axios.put(
-          `http://localhost:3000/database/api/room/whiteboardHistory`,
+          `${import.meta.env.VITE_API_URL}/database/api/room/whiteboardHistory`,
           { roomId: roomId, whiteboardHistory: getHistory },
           {
             headers: authenticationHeader,
@@ -328,7 +330,7 @@ const Whiteboard = () => {
       };
       try {
         const response = await axios.get(
-          `http://localhost:3000/database/api/room/whiteboardHistory`,
+          `${import.meta.env.VITE_API_URL}/database/api/room/whiteboardHistory`,
           {
             headers: authenticationHeader,
             params: {
@@ -346,7 +348,7 @@ const Whiteboard = () => {
       };
       try {
         const response = await axios.get(
-          `http://localhost:3000/database/api/room/whiteboardElements`,
+          `${process.env.VITE_API_URL}/database/api/room/whiteboardElements`,
           {
             headers: authenticationHeader,
             params: {
