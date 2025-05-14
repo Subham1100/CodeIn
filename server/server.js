@@ -1,4 +1,5 @@
 import express from "express";
+import passport from "passport";
 const app = express();
 app.use(express.json());
 import path from "path";
@@ -34,7 +35,19 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-app.options("/run", cors()); // Handle preflight explicitly
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  next();
+});
+// app.options("*", cors());
+// app.options("/run", cors()); // Handle preflight explicitly
 
 //config
 import "./config/database.js";
@@ -52,7 +65,7 @@ setupSocket(server);
 
 //routes
 import routes from "./routes/index.js";
-import passport from "passport";
+
 app.use("/", routes);
 
 app.get("/", (req, res) => {
