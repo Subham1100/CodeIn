@@ -10,16 +10,30 @@ const envPath = path.resolve(
 
 dotenv.config({ path: envPath });
 
+const allowedOrigins = [
+  "whiteboard-liart-phi.vercel.app",
+  "whiteboard-git-main-subham1100s-projects.vercel.app",
+  "whiteboard-lc1uwhja8-subham1100s-projects.vercel.app",
+  "whiteboard-subham1100s-projects.vercel.app",
+];
+
 //cors
 import cors from "cors";
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // Match your frontend port
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    }, // Match your frontend port
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 app.options("/run", cors()); // Handle preflight explicitly
 
 //config
