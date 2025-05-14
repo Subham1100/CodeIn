@@ -16,25 +16,27 @@ const allowedOrigins = [
   "whiteboard-git-main-subham1100s-projects.vercel.app",
   "whiteboard-lc1uwhja8-subham1100s-projects.vercel.app",
   "whiteboard-subham1100s-projects.vercel.app",
+  "http://localhost:5000",
 ];
 
 //cors
 import cors from "cors";
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    }, // Match your frontend port
+    origin: "*", // Match your frontend port
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
