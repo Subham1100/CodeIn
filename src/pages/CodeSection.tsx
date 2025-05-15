@@ -140,8 +140,8 @@ const CodeSection = () => {
     try {
       const RunAPI =
         SelectedProblem === 0
-          ? `${import.meta.env.VITE_API_URL}/docker/editor/run`
-          : `${import.meta.env.VITE_API_URL}/docker/run`;
+          ? `http://13.201.59.97/editor`
+          : `http://13.201.59.97/run`;
 
       const newCode = SelectedProblem == 0 ? code : await generateNewCode();
 
@@ -264,20 +264,17 @@ const CodeSection = () => {
     try {
       const newCode = await generateNewCode();
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/docker/submit`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            language,
-            code: newCode,
-            input: testCaseInput,
-          }),
-        }
-      );
+      const response = await fetch(`http://13.201.59.97/submit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language,
+          code: newCode,
+          input: testCaseInput,
+        }),
+      });
       logEvent(
         "Received response from server",
         { status: response.status },

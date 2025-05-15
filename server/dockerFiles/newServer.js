@@ -1,15 +1,7 @@
 import express from "express";
-import passport from "passport";
 const app = express();
 app.use(express.json());
-import path from "path";
-import dotenv from "dotenv";
-const envPath = path.resolve(
-  path.dirname(new URL(import.meta.url).pathname),
-  "../.env"
-);
-
-dotenv.config({ path: envPath });
+import { createServer } from "http";
 
 const allowedOrigins = [
   "whiteboard-liart-phi.vercel.app",
@@ -54,29 +46,17 @@ app.use((req, res, next) => {
 
 app.options("/run", cors()); // Handle preflight explicitly
 
-//config
-import "./config/database.js";
-import morganMiddleware from "./config/morganlogger.js";
-import configurePassport from "./config/passport.js";
-app.use(morganMiddleware);
-configurePassport(passport);
-app.use(passport.initialize());
-
-//services
-import { createServer } from "http";
-import setupSocket from "./services/socketHandler.js";
-const server = createServer(app);
-setupSocket(server);
-
-//routes
-import routes from "./routes/index.js";
-
-app.use("/", routes);
+import { handleEditor } from "./editor.js";
+import { handleSubmit } from "./submit";
+import { handleRun } from "./run.js";
+app.use("/run", handleRun);
+app.use("/submit", handleSubmit);
+app.use("/editor/run", handleEditor);
 
 app.get("/", (req, res) => {
   res.send("this is whiteboard");
 });
-
+const server = createServer(app);
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log(`server is running on http://localhost:${port}`);
