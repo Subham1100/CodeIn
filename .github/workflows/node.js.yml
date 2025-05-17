@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Backend CI/CD
 
 on:
   push:
@@ -7,34 +7,42 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  deploy-backend:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [22.x]
 
-    steps:  
-      - name : install dependencies
-        run: | 
-          npm install
-      - name: Create .env file with secrets
-        run: |
-          echo "PORT=${{ secrets.PORT }}" >> .env
-          echo "VITE_PORT=${{ secrets.VITE_PORT }}" >> .env
-          echo "VITE_LOG_LEVEL=${{ secrets.VITE_LOG_LEVEL }}" >> .env
-          echo "DB_STRING='${{ secrets.DB_STRING }}'" >> .env
-          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
-          echo "PUB_KEY='${{ secrets.PUB_KEY }}'" >> .env
-          echo "PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}'" >> .env
-          echo "API_URL=${{ secrets.API_URL }}" >> .env
-          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
-          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
-          echo "VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}" >> .env
-          echo "allowedOrigins='${{ secrets.allowedOrigins }}'" >> .env
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Copy only server folder to EC2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install server dependencies
+        run: npm install
+        working-directory: server
+
+      - name: Create server/.env with secrets
+        run: |
+          echo "PORT=${{ secrets.PORT }}" >> server/.env
+          echo "VITE_PORT=${{ secrets.VITE_PORT }}" >> server/.env
+          echo "VITE_LOG_LEVEL=${{ secrets.VITE_LOG_LEVEL }}" >> server/.env
+          echo "DB_STRING='${{ secrets.DB_STRING }}'" >> server/.env
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> server/.env
+          echo "PUB_KEY='${{ secrets.PUB_KEY }}'" >> server/.env
+          echo "PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}'" >> server/.env
+          echo "API_URL=${{ secrets.API_URL }}" >> server/.env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> server/.env
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> server/.env
+          echo "VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}" >> server/.env
+          echo "allowedOrigins='${{ secrets.allowedOrigins }}'" >> server/.env
+
+      - name: Deploy server folder to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
