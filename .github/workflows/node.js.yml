@@ -1,0 +1,52 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+      - name: Create .env file with secrets
+        run: |
+          echo "PORT=${{ secrets.PORT }}" >> .env
+          echo "VITE_PORT=${{ secrets.VITE_PORT }}" >> .env
+          echo "VITE_LOG_LEVEL=${{ secrets.VITE_LOG_LEVEL }}" >> .env
+          echo "DB_STRING='${{ secrets.DB_STRING }}'" >> .env
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
+          echo "PUB_KEY='${{ secrets.PUB_KEY }}'" >> .env
+          echo "PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}'" >> .env
+          echo "API_URL=${{ secrets.API_URL }}" >> .env
+          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+          echo "VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}" >> .env
+          echo "allowedOrigins='${{ secrets.allowedOrigins }}'" >> .env
+
+      - name: Copy only server folder to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "server/**"
+          target: "/home/ec2-user/whiteboard/server"
+
+      - name: SSH into EC2 and restart server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/whiteboard/server
+            npm install
+
