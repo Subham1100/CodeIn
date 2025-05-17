@@ -35,21 +35,21 @@ jobs:
           echo "DB_STRING='${{ secrets.DB_STRING }}'" >> server/.env
           echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> server/.env
           echo "PUB_KEY='${{ secrets.PUB_KEY }}'" >> server/.env
-          echo "PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}'" >> server/.env
+          echo "PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}" >> server/.env
           echo "API_URL=${{ secrets.API_URL }}" >> server/.env
           echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> server/.env
           echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> server/.env
           echo "VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}" >> server/.env
           echo "allowedOrigins='${{ secrets.allowedOrigins }}'" >> server/.env
 
-      - name: Deploy server folder to EC2
+      - name: Deploy whole repo to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "server/**"
-          target: "/home/ec2-user/whiteboard/server"
+          source: "./**"            # Upload everything in the repo root
+          target: "/home/ec2-user/whiteboard"  # Target folder on EC2
 
       - name: SSH into EC2 and restart server
         uses: appleboy/ssh-action@master
@@ -60,4 +60,4 @@ jobs:
           script: |
             cd /home/ec2-user/whiteboard/server
             npm install
-
+            # Add any server restart commands here, e.g. pm2 restart or systemctl restart
