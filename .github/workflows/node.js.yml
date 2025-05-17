@@ -27,20 +27,7 @@ jobs:
         run: npm install
         working-directory: server
 
-      - name: Create server/.env with secrets
-        run: |
-          echo "PORT=${{ secrets.PORT }}" >> server/.env
-          echo "VITE_PORT=${{ secrets.VITE_PORT }}" >> server/.env
-          echo "VITE_LOG_LEVEL=${{ secrets.VITE_LOG_LEVEL }}" >> server/.env
-          echo "DB_STRING='${{ secrets.DB_STRING }}'" >> server/.env
-          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> server/.env
-          echo "PUB_KEY='${{ secrets.PUB_KEY }}'" >> server/.env
-          echo "PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}" >> server/.env
-          echo "API_URL=${{ secrets.API_URL }}" >> server/.env
-          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> server/.env
-          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> server/.env
-          echo "VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}" >> server/.env
-          echo "allowedOrigins='${{ secrets.allowedOrigins }}'" >> server/.env
+     
 
       - name: Deploy whole repo to EC2
         uses: appleboy/scp-action@master
@@ -50,6 +37,28 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "./**"            # Upload everything in the repo root
           target: "/home/ec2-user/whiteboard"  # Target folder on EC2
+          
+      - name: Create .env file on EC2 server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cat > /home/ec2-user/whiteboard/.env <<EOF
+            PORT=${{ secrets.PORT }}
+            VITE_PORT=${{ secrets.VITE_PORT }}
+            VITE_LOG_LEVEL=${{ secrets.VITE_LOG_LEVEL }}
+            DB_STRING='${{ secrets.DB_STRING }}'
+            NODE_ENV=${{ secrets.NODE_ENV }}
+            PUB_KEY='${{ secrets.PUB_KEY }}'
+            PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}'
+            API_URL=${{ secrets.API_URL }}
+            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+            VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}
+            allowedOrigins='${{ secrets.allowedOrigins }}'
+            EOF
 
       - name: SSH into EC2 and restart server
         uses: appleboy/ssh-action@master
@@ -61,3 +70,4 @@ jobs:
             cd /home/ec2-user/whiteboard/server
             npm install
             # Add any server restart commands here, e.g. pm2 restart or systemctl restart
+
