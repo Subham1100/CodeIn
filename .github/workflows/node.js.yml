@@ -46,7 +46,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            touch .env
+            echo "${{ secrets.PROD_SECRET }}" > ${{ env.ROOT_PATH }}/.env
             cd ${{ env.ROOT_PATH }}/server
             npm install
             npm run dev
