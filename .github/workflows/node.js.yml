@@ -15,7 +15,10 @@ jobs:
       matrix:
         node-version: [18.x, 20.x, 22.x]
 
-    steps:
+    steps:  
+      - name : install dependencies
+        run: | 
+          npm ci
       - name: Create .env file with secrets
         run: |
           echo "PORT=${{ secrets.PORT }}" >> .env
