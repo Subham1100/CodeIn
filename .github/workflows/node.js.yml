@@ -48,20 +48,8 @@ jobs:
           script: |
             mkdir -p ${{ env.ROOT_PATH }}
             sudo chmod 777 -R ${{ env.ROOT_PATH }}
-            cat > ${{ env.ROOT_PATH }}/.env <<EOF
-            PORT=${{ secrets.PORT }}
-            VITE_PORT=${{ secrets.VITE_PORT }}
-            VITE_LOG_LEVEL=${{ secrets.VITE_LOG_LEVEL }}
-            DB_STRING='${{ secrets.DB_STRING }}'
-            NODE_ENV=${{ secrets.NODE_ENV }}
-            PUB_KEY='${{ secrets.PUB_KEY }}'
-            PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}'
-            API_URL=${{ secrets.API_URL }}
-            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
-            VITE_API_URL=${{ secrets.VITE_API_URL }}
-            VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}
-            allowedOrigins='${{ secrets.allowedOrigins }}'
-            EOF
+            echo "${{ secrets.PROD_SECRET }}" > ${{ env.ROOT_PATH }}/.env
+            ls -la ${{ env.ROOT_PATH }}
 
       - name: SSH into EC2 and restart server
         uses: appleboy/ssh-action@master
