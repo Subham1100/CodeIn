@@ -38,27 +38,7 @@ jobs:
           source: "./**"            # Upload everything in the repo root
           target: "/home/ec2-user/whiteboard"  # Target folder on EC2
           
-      - name: Create .env file on EC2 server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cat > /home/ec2-user/whiteboard/.env <<EOF
-            PORT=${{ secrets.PORT }}
-            VITE_PORT=${{ secrets.VITE_PORT }}
-            VITE_LOG_LEVEL=${{ secrets.VITE_LOG_LEVEL }}
-            DB_STRING='${{ secrets.DB_STRING }}'
-            NODE_ENV=${{ secrets.NODE_ENV }}
-            PUB_KEY='${{ secrets.PUB_KEY }}'
-            PRIVATE_KEY='${{ secrets.PRIVATE_KEY }}'
-            API_URL=${{ secrets.API_URL }}
-            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
-            VITE_API_URL=${{ secrets.VITE_API_URL }}
-            VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}
-            allowedOrigins='${{ secrets.allowedOrigins }}'
-            EOF
+    
 
       - name: SSH into EC2 and restart server
         uses: appleboy/ssh-action@master
