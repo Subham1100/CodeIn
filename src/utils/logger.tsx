@@ -13,8 +13,7 @@ const CURRENT_LOG_LEVEL: LogLevel =
 
 export const logEvent = (eventName: string, data: any, level: LogLevel = 1) => {
   if (level <= CURRENT_LOG_LEVEL) {
-    console.log(`[Level ${level}] ${eventName}`, data);
-
+    // console.log(`[Level ${level}] ${eventName}`, data);
     // LogRocket.log(`[Level ${level}] ${eventName}`, data);
   }
 };

@@ -82,7 +82,6 @@ const Room = () => {
           headers: authenticationHeader,
         })
         .then((response) => {
-          console.log("User profile data:", response.data.user);
           setUser(response.data.user);
           setIsAuthenticated(true);
         })

@@ -36,7 +36,7 @@ const auth = () => {
         })
         .then((response) => {
           LogLevel.INFO;
-          console.log(response);
+
           if (response.data.token) {
             localStorage.setItem("token", response.data.token);
             navigate("/rooms");
@@ -64,7 +64,6 @@ const auth = () => {
         })
         .then((response) => {
           LogLevel.INFO;
-          console.log(response);
         })
         .catch((error) => {
           LogLevel.ERROR;

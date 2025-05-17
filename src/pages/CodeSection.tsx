@@ -140,8 +140,8 @@ const CodeSection = () => {
     try {
       const RunAPI =
         SelectedProblem === 0
-          ? `http://13.201.59.97/editor`
-          : `http://13.201.59.97/run`;
+          ? `${import.meta.env.VITE_API_URL}/docker/editor/run`
+          : `${import.meta.env.VITE_API_URL}/docker/run`;
 
       const newCode = SelectedProblem == 0 ? code : await generateNewCode();
 
@@ -246,12 +246,15 @@ const CodeSection = () => {
     }
 
     setISsubmit(false);
+    setCodeError("");
   };
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = parseInt(e.target.value);
+    console.log(selected);
     if (selected === 0) {
       setCode(languageOptions[language].value); // Reset code to the default value for the selected language
+      console.log(languageOptions[language].value);
       socket.emit("code-changed", languageOptions[language].value);
     } else {
       setCode(data.boilerplateUser[language]); // Set the appropriate boilerplate code based on the problem
@@ -264,17 +267,20 @@ const CodeSection = () => {
     try {
       const newCode = await generateNewCode();
 
-      const response = await fetch(`http://13.201.59.97/submit`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          language,
-          code: newCode,
-          input: testCaseInput,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/docker/submit`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            language,
+            code: newCode,
+            input: testCaseInput,
+          }),
+        }
+      );
       logEvent(
         "Received response from server",
         { status: response.status },
