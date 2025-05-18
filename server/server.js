@@ -65,7 +65,20 @@ app.use(passport.initialize());
 //services
 import { createServer } from "http";
 import setupSocket from "./services/socketHandler.js";
-const server = createServer(app);
+import { createServer } from "https";
+import fs from "fs";
+
+const sslOptions = {
+  key: fs.readFileSync(
+    "/etc/letsencrypt/live/whiteboardml.duckdns.org/privkey.pem"
+  ),
+  cert: fs.readFileSync(
+    "/etc/letsencrypt/live/whiteboardml.duckdns.org/fullchain.pem"
+  ),
+};
+
+const server = createServer(sslOptions, app);
+
 setupSocket(server);
 
 //routes
