@@ -65,7 +65,7 @@ app.use(passport.initialize());
 //services
 import { createServer } from "http";
 import setupSocket from "./services/socketHandler.js";
-import { createServer } from "https";
+
 import fs from "fs";
 
 const sslOptions = {

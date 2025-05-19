@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react";
 import { io, Socket } from "socket.io-client";
 
-const server = import.meta.env.VITE_API_SOCKET;
+const server = import.meta.env.VITE_API;
 
 // Create socket instance
 const socket: Socket = io(server, {
