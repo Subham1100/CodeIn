@@ -4,16 +4,10 @@ import { io, Socket } from "socket.io-client";
 const server = import.meta.env.VITE_API_URL;
 
 // Create socket instance
-const socket: Socket = io(server, {
-  reconnectionDelayMax: 10000,
-  transports: ["websocket"],
-  auth: {
-    token: "123",
-  },
-  query: {
-    "my-key": "my-value",
-  },
+const socket: Socket = io("wss://whiteboardml.duckdns.org", {
   path: "/socket.io",
+  reconnectionDelayMax: 10000,
+  secure: true,
 });
 
 // Create Context

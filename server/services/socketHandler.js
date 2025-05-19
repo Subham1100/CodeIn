@@ -10,12 +10,18 @@ const envPath = path.resolve(
 );
 
 dotenv.config({ path: envPath });
+const allowedOrigins = [
+  "https://whiteboard-liart-phi.vercel.app",
+  "https://whiteboard-git-main-subham1100s-projects.vercel.app",
+  "https://whiteboard-lc1uwhja8-subham1100s-projects.vercel.app",
+  "https://whiteboard-subham1100s-projects.vercel.app",
+];
 
 export default function (server) {
   const io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL, // Match frontend port
-      methods: ["GET", "POST"],
+      origin: allowedOrigins, // Match frontend port
+      methods: ["GET", "POST", "PUT", "DELETE"],
     },
   });
 
