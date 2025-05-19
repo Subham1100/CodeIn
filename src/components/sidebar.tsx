@@ -130,7 +130,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     onClick={() => setToggle(!toggle)}
                     className="bg-[#2b5f23] p-1.5 rounded flex items-center justify-center hover:bg-[#94e58a]"
                   >
-                    {/* <MemberDropdown member={member} accessData={accessData} /> */}
+                    <MemberDropdown member={member} accessData={accessData} />
                   </button>
                   <button
                     onClick={() => handleKickMember(member)}

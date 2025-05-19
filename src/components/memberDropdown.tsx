@@ -19,10 +19,10 @@ const MemberDropdown = ({ member, accessData }: Props) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const socket = useSocket();
-  const [options, setOptions] = useState({
-    whiteboard: accessData[member].whiteboard,
-    codeEditor: accessData[member].codeEditor,
-    codeEditorOptions: accessData[member].codeEditorOptions,
+  const [options, setOptions] = useState<AccessOptions>({
+    whiteboard: accessData[member]?.whiteboard ?? false,
+    codeEditor: accessData[member]?.codeEditor ?? false,
+    codeEditorOptions: accessData[member]?.codeEditorOptions ?? false,
   });
   const { roomId } = useParams();
 
