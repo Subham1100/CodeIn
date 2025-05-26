@@ -9,6 +9,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useSocket } from "../hooks/socketContext.tsx";
 import { Socket } from "socket.io-client";
+import TempWhiteboard from "./tempWhiteboard.tsx";
 
 const CodeIn = () => {
   const [members, setMembers] = useState<string[]>([]);
@@ -75,7 +76,8 @@ const CodeIn = () => {
         </PanelResizeHandle>
 
         <Panel defaultSize={25} className="h-full overflow-auto">
-          <Whiteboard />
+          {/* <Whiteboard /> */}
+          <TempWhiteboard />
         </Panel>
       </PanelGroup>
       {(currUser !== "" || currUser !== null || currUser !== undefined) && (

@@ -30,7 +30,7 @@ export default async function (req, res) {
         };
       }
     });
-    console.log(data);
+
     return res.status(200).json({ permissions: data });
   } catch (err) {
     console.error("Error updating member access:", err);

@@ -62,7 +62,6 @@ const MemberDropdown = ({ member, accessData }: Props) => {
             },
           }
         );
-        console.log("Access updated");
       } catch (error) {
         console.error("Failed to update access", error);
       }

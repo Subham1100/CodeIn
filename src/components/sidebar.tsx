@@ -49,9 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     socket.emit(
       "leave",
       roomData,
-      (response: { status: string; error?: string }) => {
-        if (response.status === "ok") console.log("left sucessfully");
-      }
+      (response: { status: string; error?: string }) => {}
     );
     navigate("/rooms");
   };
@@ -66,9 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         headers: authenticationHeader,
         data: { username: member, roomId: roomId },
       })
-      .then((response) => {
-        console.log("kicked successfully");
-      })
+      .then((response) => {})
       .catch((error) => {
         console.log(error);
       });

@@ -222,7 +222,6 @@ const Canvas: React.FC<CanvasProps> = ({
             }
           })
         );
-        console.log("element created" + getElements.length);
       } else if (tool === "line") {
         setElements((prevElements: DrawElement[]) =>
           prevElements.map((ele, index) => {

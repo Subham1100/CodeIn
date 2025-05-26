@@ -1,16 +1,4 @@
 import mongoose from "mongoose";
-const whiteboardElementSchema = {
-  type: { type: String, required: true },
-  offsetX: { type: Number, required: true },
-  offsetY: { type: Number, required: true },
-  path: {
-    type: [[Number]], // Array of [number, number]
-    required: true,
-  },
-  stroke: { type: String, required: true },
-  width: { type: Number, required: true },
-  height: { type: Number, required: true },
-};
 
 const roomSchema = new mongoose.Schema(
   {
@@ -59,8 +47,11 @@ const roomSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    whiteboardElements: [whiteboardElementSchema],
-    whiteboardHistory: [whiteboardElementSchema],
+    tlDrawElements: {
+      added: [mongoose.Schema.Types.Mixed],
+      updated: [mongoose.Schema.Types.Mixed],
+      removed: [mongoose.Schema.Types.Mixed],
+    },
   },
   { timestamps: true }
 );

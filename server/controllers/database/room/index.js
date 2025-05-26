@@ -15,3 +15,5 @@ export { default as GetRoomOutput } from "./getRoomOuput.js";
 export { default as GetWhiteboardElements } from "./getWhiteboardElements.js";
 export { default as UpdateWhiteboardHistory } from "./whiteboardHistory.js";
 export { default as GetWhiteboardHistory } from "./getWhiteboardHistory.js";
+export { default as GetTlDrawElements } from "./getTlDraw.js";
+export { default as TlDrawElements } from "./tlDraw.js";

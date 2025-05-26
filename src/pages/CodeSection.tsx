@@ -251,10 +251,10 @@ const CodeSection = () => {
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = parseInt(e.target.value);
-    console.log(selected);
+
     if (selected === 0) {
       setCode(languageOptions[language].value); // Reset code to the default value for the selected language
-      console.log(languageOptions[language].value);
+
       socket.emit("code-changed", languageOptions[language].value);
     } else {
       setCode(data.boilerplateUser[language]); // Set the appropriate boilerplate code based on the problem

@@ -19,6 +19,8 @@ import {
   GetWhiteboardElements,
   UpdateWhiteboardHistory,
   GetWhiteboardHistory,
+  GetTlDrawElements,
+  TlDrawElements,
 } from "../../controllers/database/room/index.js";
 
 router.post(
@@ -72,6 +74,16 @@ router.get(
   "/whiteboardElements",
   passport.authenticate("jwt", { session: false }),
   GetWhiteboardElements
+);
+router.get(
+  "/tlDrawElements",
+  passport.authenticate("jwt", { session: false }),
+  GetTlDrawElements
+);
+router.post(
+  "/tlDrawElements",
+  passport.authenticate("jwt", { session: false }),
+  TlDrawElements
 );
 router.put(
   "/access",

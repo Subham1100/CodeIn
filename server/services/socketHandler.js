@@ -4,6 +4,8 @@ import { Server } from "socket.io";
 import axios from "axios";
 import path from "path";
 import dotenv from "dotenv";
+import { Edit } from "lucide-react";
+import { data } from "react-router-dom";
 const envPath = path.resolve(
   path.dirname(new URL(import.meta.url).pathname),
   "../../.env"
@@ -15,6 +17,7 @@ const allowedOrigins = [
   "https://whiteboard-git-main-subham1100s-projects.vercel.app",
   "https://whiteboard-lc1uwhja8-subham1100s-projects.vercel.app",
   "https://whiteboard-subham1100s-projects.vercel.app",
+  "http://localhost:5000",
 ];
 
 export default function (server) {
@@ -68,23 +71,10 @@ export default function (server) {
       io.to(roomId).emit("members-updated");
     });
 
-    socket.on("drawElement", async (newElement) => {
-      socket.broadcast.emit("updateCanvas", {
-        type: "updateCanvas",
-        element: newElement,
-      });
-    });
+    socket.on("whiteboardChanged", async (data) => {
+      const { changes } = data;
 
-    socket.on("clearCanvas", () => {
-      socket.broadcast.emit("updateClearCanvas", { type: "clearCanvas" });
-    });
-
-    socket.on("undoCanvas", () => {
-      socket.broadcast.emit("updateUndoCanvas", { type: "undoCanvas" });
-    });
-
-    socket.on("redoCanvas", () => {
-      socket.broadcast.emit("updateRedoCanvas", { type: "redoCanvas" });
+      socket.broadcast.emit("whiteboardUpdated", changes);
     });
 
     socket.on("leave", async (data, callback) => {

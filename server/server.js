@@ -68,16 +68,17 @@ import setupSocket from "./services/socketHandler.js";
 
 import fs from "fs";
 
-const sslOptions = {
-  key: fs.readFileSync(
-    "/etc/letsencrypt/live/whiteboardml.duckdns.org/privkey.pem"
-  ),
-  cert: fs.readFileSync(
-    "/etc/letsencrypt/live/whiteboardml.duckdns.org/fullchain.pem"
-  ),
-};
+// const sslOptions = {
+//   key: fs.readFileSync(
+//     "/etc/letsencrypt/live/whiteboardml.duckdns.org/privkey.pem"
+//   ),
+//   cert: fs.readFileSync(
+//     "/etc/letsencrypt/live/whiteboardml.duckdns.org/fullchain.pem"
+//   ),
+// };
 
-const server = createServer(sslOptions, app);
+// const server = createServer(sslOptions, app);
+const server = createServer(app);
 
 setupSocket(server);
 
