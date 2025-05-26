@@ -4,8 +4,6 @@ import { Server } from "socket.io";
 import axios from "axios";
 import path from "path";
 import dotenv from "dotenv";
-import { Edit } from "lucide-react";
-import { data } from "react-router-dom";
 const envPath = path.resolve(
   path.dirname(new URL(import.meta.url).pathname),
   "../../.env"
