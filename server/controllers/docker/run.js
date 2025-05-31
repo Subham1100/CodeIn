@@ -2,9 +2,13 @@ import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
 import os from "os";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function handleRun(req, res) {
-  const { code, language, input, SelectedProblem = "" } = req.body;
+  const { code, language, input = "", SelectedProblem = "0" } = req.body;
 
   const fileNames = {
     cpp: "main.cpp",
@@ -25,9 +29,11 @@ function handleRun(req, res) {
   let dockerCommand = "";
 
   if (language === "cpp") {
-    const solutionPath = "../temp/1/SolutionCpp.txt";
+    const solutionPath = path.resolve(
+      __dirname,
+      `../../../temp/${SelectedProblem}/solution/${language}.txt`
+    );
     const destinationPath = path.join(tempDir, "solution.cpp");
-
     fs.copyFileSync(solutionPath, destinationPath);
 
     dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "\
@@ -37,7 +43,10 @@ function handleRun(req, res) {
           echo '${input}' | /app/user_sol > /app/user_output.txt && \
           cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else if (language === "java") {
-    const solutionPath = "../temp/1/SolutionJava.txt";
+    const solutionPath = path.resolve(
+      __dirname,
+      `../../../temp/${SelectedProblem}/solution/${language}.txt`
+    );
     const destinationPath = path.join(tempDir, "solution.java");
 
     fs.copyFileSync(solutionPath, destinationPath);
@@ -47,7 +56,10 @@ function handleRun(req, res) {
       echo '${input}' | java -cp /app Solution > /app/user_output.txt && \
       cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else if (language === "python") {
-    const solutionPath = "../temp/1/SoutionPython.txt";
+    const solutionPath = path.resolve(
+      __dirname,
+      `../../../temp/${SelectedProblem}/solution/${language}.txt`
+    );
     const destinationPath = path.join(tempDir, "solution.py");
 
     fs.copyFileSync(solutionPath, destinationPath);
@@ -60,14 +72,20 @@ function handleRun(req, res) {
   }
 
   exec(dockerCommand, (err, stdout, stderr) => {
-    if (err || stderr) {
-      // If there is an error, send an error response with status `false`
+    if (stderr) {
+      return res.status(200).json({
+        ok: false,
+        output: stderr || err.message,
+      });
+    }
+    if (err) {
       return res.status(500).json({
         ok: false,
         output: stderr || err.message,
       });
     }
-    res.json({ output: stdout });
+
+    res.json({ ok: true, output: stdout });
   });
 }
 

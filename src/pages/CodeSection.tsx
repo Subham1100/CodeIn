@@ -58,12 +58,23 @@ const CodeSection = () => {
     java: setJavaValue,
     python: setPythonValue,
   };
+  type BoilerplateCode = {
+    cpp: string;
+    python: string;
+    java: string;
+    cppSol: string;
+    javaSol: string;
+    pythonSol: string;
+  };
 
   const [language, setLanguage] = useState<keyof typeof languageOptions>("cpp");
+  const [languageSol, setLanguageSol] =
+    useState<keyof BoilerplateCode>("cppSol");
   const [code, setCode] = useState(languageOptions["cpp"].value);
   const [responseUpdate, setResponseUpdate] = useState("");
   const [expectedResponseUpdate, setExpectedResponseUpdate] = useState("");
-
+  const [boilerplateCode, setBoilerplateCode] =
+    useState<BoilerplateCode | null>(null);
   const [testCaseInput, setTestCaseInput] = useState("");
   const [SelectedProblem, setSelectedProblem] = useState(0);
   const [IsSubumit, setISsubmit] = useState(false);
@@ -71,10 +82,16 @@ const CodeSection = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (!boilerplateCode) return;
+
     const lang = e.target.value as keyof typeof languageOptions;
     setLanguage(lang);
-    setCode(languageOptions[lang].value);
-    socket.emit("code-changed", languageOptions[lang].value);
+
+    const codeForLang = boilerplateCode[lang];
+    if (codeForLang) {
+      setCode(codeForLang);
+      socket.emit("code-changed", codeForLang);
+    }
   };
 
   const getLanguageExtension = () => {
@@ -88,11 +105,6 @@ const CodeSection = () => {
       default:
         return cpp();
     }
-  };
-
-  const loadBoilerplate = async (filename: string): Promise<string> => {
-    const response = await fetch(`../../temp/${SelectedProblem}/${filename}`);
-    return await response.text();
   };
 
   const splitBoilerplate = (
@@ -117,13 +129,14 @@ const CodeSection = () => {
       afterEnd, // code after endMarker
     };
   };
+  useEffect(() => {
+    setLanguageSol(`${language}Sol`);
+  }, [language]);
 
   const generateNewCode = async () => {
+    if (!boilerplateCode) return;
     try {
-      const [boilerplateUser1] = await Promise.all([
-        loadBoilerplate("solutionCpp.txt"),
-      ]);
-
+      const boilerplateUser1 = boilerplateCode[languageSol];
       const { beforeStart, middle, afterEnd } = splitBoilerplate(
         boilerplateUser1,
         "//-----------startofcode--------------------",
@@ -137,6 +150,9 @@ const CodeSection = () => {
     }
   };
   const handleRunCode = async () => {
+    setExpectedResponseUpdate("");
+    setResponseUpdate("");
+    setCodeError("");
     try {
       const RunAPI =
         SelectedProblem === 0
@@ -173,7 +189,6 @@ const CodeSection = () => {
           };
 
           socket.emit("code-response-changed", socketData);
-          logEvent("Code executed successfully", { data }, LogLevel.INFO);
         } else {
           const [userOutput, expectedOutput] = data.output.split("---SPLIT---");
 
@@ -188,11 +203,8 @@ const CodeSection = () => {
           logEvent("Code executed successfully", { data }, LogLevel.INFO);
         }
       } else {
-        const [beforeWarning, afterWarning] =
-          data.output.split("/app/main.cpp:");
-
-        const [beforeTerminate, afterTerminate] = afterWarning.split("^\n");
         setCodeError(data.output);
+        console.log(data.output);
 
         logEvent("Response was not OK", LogLevel.WARN);
       }
@@ -203,7 +215,6 @@ const CodeSection = () => {
       logEvent("Code execution error", { error }, LogLevel.ERROR);
     }
     setISsubmit(false);
-    setCodeError("");
   };
 
   const handleChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -215,36 +226,37 @@ const CodeSection = () => {
         textareaRef.current.scrollHeight + "px";
     }
   };
-  const data = {
-    boilerplateUser: {
-      cpp: `vector<int> twoSum(vector<int>& nums, int target) {\n \n}`,
-      java: `public int[] twoSum(int[] nums, int target) {\n\n}`,
-      python: `def twoSum(self, nums: List[int], target: int) -> List[int]:\n\n`,
-    },
+
+  const fetchBoilerplates = async (SelectedProblem: number) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/get_boilerplate`,
+        {
+          params: { SelectedProblem },
+        }
+      );
+      return response.data.data; // contains cpp, java, python code
+    } catch (error) {
+      console.error("Error fetching boilerplates:", error);
+    }
   };
+  useEffect(() => {
+    const getBoilerplates = async () => {
+      const code = await fetchBoilerplates(SelectedProblem);
+      if (code) {
+        setBoilerplateCode(code);
+      }
+      setCode(code[language]); // Set the appropriate boilerplate code based on the problem
+      socket.emit("code-changed", boilerplateCode);
+    };
+
+    getBoilerplates();
+  }, [SelectedProblem]);
 
   const handleResetButton = () => {
-    if (SelectedProblem == 0) {
-      const languageData = {
-        cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`,
-        java: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Java!");\n  }\n}`,
-        python: `print("Hello, Python!")\nfor i in range(5):\n    print(i)`,
-      };
-      if (language === "cpp") {
-        setCode(languageData.cpp);
-        socket.emit("code-changed", languageData.cpp);
-      } else if (language === "java") {
-        setCode(languageData.java);
-        socket.emit("code-changed", languageData.java);
-      } else if (language === "python") {
-        setCode(languageData.python);
-        socket.emit("code-changed", languageData.python);
-      }
-    } else {
-      setCode(data.boilerplateUser[language]);
-      socket.emit("code-changed", data.boilerplateUser[language]);
-    }
-
+    if (!language || !boilerplateCode) return;
+    const selectedCode = boilerplateCode[language];
+    socket.emit("code-changed", selectedCode);
     setISsubmit(false);
     setCodeError("");
   };
@@ -252,18 +264,12 @@ const CodeSection = () => {
   const handleQuestionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = parseInt(e.target.value);
 
-    if (selected === 0) {
-      setCode(languageOptions[language].value); // Reset code to the default value for the selected language
-
-      socket.emit("code-changed", languageOptions[language].value);
-    } else {
-      setCode(data.boilerplateUser[language]); // Set the appropriate boilerplate code based on the problem
-      socket.emit("code-changed", data.boilerplateUser[language]);
-    }
     setSelectedProblem(selected);
   };
 
   const handleSubmitCode = async () => {
+    setExpectedResponseUpdate("");
+    setResponseUpdate("");
     try {
       const newCode = await generateNewCode();
 
@@ -278,6 +284,7 @@ const CodeSection = () => {
             language,
             code: newCode,
             input: testCaseInput,
+            SelectedProblem: SelectedProblem,
           }),
         }
       );
@@ -290,7 +297,7 @@ const CodeSection = () => {
         const data = await response.json();
 
         const [expectedOutput, userOutput] = data.output.split("---SPLIT---");
-
+        console.log(expectedOutput, userOutput);
         setExpectedResponseUpdate(expectedOutput.trim());
         setResponseUpdate(userOutput.trim());
         const socketData = {

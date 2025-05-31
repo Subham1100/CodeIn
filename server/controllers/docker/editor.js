@@ -21,10 +21,6 @@ function handleEditor(req, res) {
 
   fs.writeFileSync(filePath, code);
 
-  const fileData = fs.readFileSync(filePath, "utf-8");
-
-  // Log the file data
-
   let dockerCommand = "";
 
   if (language === "cpp") {

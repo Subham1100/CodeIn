@@ -1,0 +1,17 @@
+#-----------startofcode--------------------
+def isValid(s):
+    stack = []
+    mapping = {')': '(', '}': '{', ']': '['}
+    for char in s:
+        if char in mapping:
+            top = stack.pop() if stack else '#'
+            if mapping[char] != top:
+                return False
+        else:
+            stack.append(char)
+    return not stack
+#-----------endofcode--------------------
+t = int(input())
+for _ in range(t):
+    s = input().strip()
+    print("true" if isValid(s) else "false")
