@@ -130,25 +130,17 @@ const CodeIn = () => {
           <TempWhiteboard />
         </Panel>
       </PanelGroup>
-      {currUser !== "" &&
-        currUser !== null &&
-        currUser !== undefined &&
-        showSideBar === true && (
-          <div className="bg-gray-900 text-amber-50">
-            <Cross1Icon
-              className="w-10 h-7 text-white p-1 rounded-xl cursor-pointer"
-              onClick={() => {
-                setshowSideBar(!showSideBar);
-              }}
-            />
-            <Sidebar
-              hostName={host}
-              members={members}
-              isHost={currUser === host}
-              host={host}
-            />
-          </div>
-        )}
+      {showSideBar === true && (
+        <div className="bg-gray-900 text-amber-50">
+          <Cross1Icon
+            className="w-10 h-7 text-white p-1 rounded-xl cursor-pointer"
+            onClick={() => {
+              setshowSideBar(!showSideBar);
+            }}
+          />
+          <Sidebar />
+        </div>
+      )}
       {showSideBar === false && (
         <div className="absolute right-0 p-0 top-3/6 bg-amber-600 rounded-2xl">
           <button

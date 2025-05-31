@@ -21,6 +21,7 @@ import {
   GetWhiteboardHistory,
   GetTlDrawElements,
   TlDrawElements,
+  getUserAccess,
 } from "../../controllers/database/room/index.js";
 
 router.post(
@@ -48,6 +49,11 @@ router.get(
   "/get-access",
   passport.authenticate("jwt", { session: false }),
   getRoomMembersAccess
+);
+router.get(
+  "/get-user-access",
+  passport.authenticate("jwt", { session: false }),
+  getUserAccess
 );
 router.get(
   "/get-permission",

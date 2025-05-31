@@ -2,12 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-interface SidebarProps {
-  hostName: string;
-  members: string[];
-  isHost: boolean;
-  host: string;
-}
 type AccessOptions = {
   whiteboard: boolean;
   codeEditor: boolean;
@@ -26,12 +20,7 @@ import {
 } from "lucide-react";
 const API_URL = import.meta.env.VITE_API_URL;
 
-const Sidebar: React.FC<SidebarProps> = ({
-  hostName,
-  members,
-  isHost,
-  host,
-}) => {
+const Sidebar = () => {
   const socket = useSocket();
   const { roomId } = useParams();
   const navigate = useNavigate();
@@ -73,6 +62,50 @@ const Sidebar: React.FC<SidebarProps> = ({
     };
     socket.emit("member-kicked", roomData);
   };
+  const [members, setMembers] = useState<string[]>([]);
+  const [inRoom, setInRoom] = useState(true);
+
+  const [host, setHost] = useState("");
+  const [currUser, setCurrUser] = useState("");
+  const [isHost, setIsHost] = useState(false);
+
+  const getMembers = async () => {
+    const token = localStorage.getItem("token");
+    const authenticationHeader = {
+      Authorization: token,
+    };
+
+    const response = await axios.get(
+      `${
+        import.meta.env.VITE_API_URL
+      }/database/api/room/members?roomId=${roomId}`,
+      {
+        headers: authenticationHeader,
+      }
+    );
+    return response.data;
+  };
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const data = await getMembers();
+        setInRoom(true);
+        setMembers(data.members);
+        setHost(data.host);
+        setCurrUser(data.currUser);
+      } catch (error) {
+        setInRoom(false);
+        console.error("Failed to fetch members", error);
+      }
+    };
+    fetchMembers();
+    socket.on("members-updated", fetchMembers);
+  }, []);
+
+  useEffect(() => {
+    setIsHost(host === currUser);
+  }, [currUser, host, members]);
 
   useEffect(() => {
     const updateOptions = async () => {
@@ -106,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     <div className="bg-gray-900 text-white w-64 min-h-screen p-4 flex flex-col space-y-6">
       {/* Host Name */}
       <div className="text-lg font-semibold border-b border-gray-700 pb-2">
-        Host: <span className="text-green-400">{hostName}</span>
+        Host: <span className="text-green-400">{host}</span>
       </div>
 
       {/* Room Members */}

@@ -17,3 +17,4 @@ export { default as UpdateWhiteboardHistory } from "./whiteboardHistory.js";
 export { default as GetWhiteboardHistory } from "./getWhiteboardHistory.js";
 export { default as GetTlDrawElements } from "./getTlDraw.js";
 export { default as TlDrawElements } from "./tlDraw.js";
+export { default as getUserAccess } from "./getUserAccess.js";

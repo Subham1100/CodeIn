@@ -247,7 +247,7 @@ const CodeSection = () => {
         setBoilerplateCode(code);
       }
       setCode(code[language]); // Set the appropriate boilerplate code based on the problem
-      socket.emit("code-changed", boilerplateCode);
+      socket.emit("code-changed", code[language]);
     };
 
     getBoilerplates();
@@ -465,6 +465,9 @@ const CodeSection = () => {
                 value={language}
                 onChange={handleLanguageChange}
                 disabled={!accessData.codeEditorOptions}
+                style={{
+                  cursor: !accessData.codeEditor ? "not-allowed" : "auto",
+                }}
               >
                 <option value="cpp">C++</option>
                 <option value="java">Java</option>
@@ -474,6 +477,9 @@ const CodeSection = () => {
                 onClick={handleRunCode}
                 className="bg-blue-500 rounded-xl p-2 px-5"
                 disabled={!accessData.codeEditorOptions}
+                style={{
+                  cursor: !accessData.codeEditor ? "not-allowed" : "auto",
+                }}
               >
                 Run
               </button>
@@ -481,6 +487,9 @@ const CodeSection = () => {
                 onClick={handleSubmitCode}
                 className="bg-blue-500 rounded-xl p-2"
                 disabled={!accessData.codeEditorOptions}
+                style={{
+                  cursor: !accessData.codeEditor ? "not-allowed" : "auto",
+                }}
               >
                 Submit
               </button>
@@ -488,6 +497,9 @@ const CodeSection = () => {
                 onClick={handleResetButton}
                 className="bg-blue-500 rounded-xl p-2"
                 disabled={!accessData.codeEditorOptions}
+                style={{
+                  cursor: !accessData.codeEditor ? "not-allowed" : "auto",
+                }}
               >
                 Reset
               </button>
@@ -496,6 +508,9 @@ const CodeSection = () => {
                 onChange={handleQuestionChange}
                 className="border rounded px-2 py-1 w-full"
                 disabled={!accessData.codeEditorOptions}
+                style={{
+                  cursor: !accessData.codeEditor ? "not-allowed" : "auto",
+                }}
               >
                 <option value="" disabled>
                   ----- Select Leetcode Problem -----
@@ -512,15 +527,20 @@ const CodeSection = () => {
                 </option>
               </select>
             </div>
-
-            <CodeMirror
-              value={code}
-              height="500px"
-              extensions={[getLanguageExtension()]}
-              onChange={handelCodeChange}
-              theme="dark"
-              readOnly={!accessData.codeEditor}
-            />
+            <div
+              style={{
+                cursor: !accessData.codeEditor ? "not-allowed" : "auto",
+              }}
+            >
+              <CodeMirror
+                value={code}
+                height="500px"
+                extensions={[getLanguageExtension()]}
+                onChange={handelCodeChange}
+                theme="dark"
+                readOnly={!accessData.codeEditor}
+              />
+            </div>
           </div>
         </Panel>
 
@@ -544,6 +564,9 @@ const CodeSection = () => {
                 className="w-full h-[40px] mr-4 resize bg-[#333333] p-2"
                 onChange={handleChangeTextArea}
                 disabled={!accessData.codeEditorOptions}
+                style={{
+                  cursor: !accessData.codeEditor ? "not-allowed" : "auto",
+                }}
               />
             </div>
             {responseUpdate === expectedResponseUpdate &&

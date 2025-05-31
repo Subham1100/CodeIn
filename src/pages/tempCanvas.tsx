@@ -28,10 +28,6 @@ export default function StoreEventsExample() {
   const socket = useSocket();
   const [editor, setEditor] = useState<Editor | null>(null);
 
-  const setAppToState = useCallback((editor: Editor) => {
-    setEditor(editor);
-  }, []);
-
   // Handle incoming socket updates (remote changes)
   useEffect(() => {
     if (!editor) return;
@@ -48,11 +44,8 @@ export default function StoreEventsExample() {
     };
 
     socket.on("whiteboardUpdated", handleUpdate);
-
-    return () => {
-      socket.off("whiteboardUpdated", handleUpdate);
-    };
   }, [editor, socket]);
+
   useEffect(() => {
     if (!editor || !roomRef.current) return;
     const getInitialData = async () => {
@@ -260,6 +253,49 @@ export default function StoreEventsExample() {
       saveChanges();
     }
   }, [isTyping]);
+  const API_URL = import.meta.env.VITE_API_URL;
+  type AccessOptions = {
+    whiteboard: boolean;
+    codeEditor: boolean;
+    codeEditorOptions: boolean;
+  };
+
+  const [accessData, setAccessData] = useState<AccessOptions>({
+    whiteboard: false,
+    codeEditor: false,
+    codeEditorOptions: false,
+  });
+
+  useEffect(() => {
+    const updateOptions = async () => {
+      const token = localStorage.getItem("token");
+      const authenticationHeader = {
+        Authorization: token,
+      };
+      try {
+        const response = await axios.get(
+          `${API_URL}/database/api/room/get-user-access`,
+          {
+            params: {
+              roomId: roomId,
+            },
+            headers: authenticationHeader,
+          }
+        );
+        setAccessData(response.data.accessData);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    updateOptions();
+
+    socket.on("access-updated", updateOptions);
+  }, []);
+
+  useEffect(() => {
+    if (!editor) return;
+    editor.updateInstanceState({ isReadonly: !accessData.whiteboard });
+  }, [accessData]);
 
   return (
     <div
@@ -267,7 +303,11 @@ export default function StoreEventsExample() {
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >
-      <Tldraw onMount={setAppToState} />
+      <Tldraw
+        onMount={(editor) => {
+          setEditor(editor);
+        }}
+      />
     </div>
   );
 }
