@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 type AccessOptions = {
   whiteboard: boolean;
@@ -8,7 +7,7 @@ type AccessOptions = {
   codeEditorOptions: boolean;
 };
 import axios from "axios";
-import { useSocket } from "../hooks/socketContext.tsx";
+import { useSocket } from "../context/socketContext.tsx";
 import MemberDropdown from "./memberDropdown.tsx";
 import {
   Pencil,
@@ -18,94 +17,44 @@ import {
   Save,
   SaveOff,
 } from "lucide-react";
+import { userRoomInfo } from "../hooks/userRoomInfo.tsx";
+import { useRoom } from "../context/RoomContext.tsx";
 const API_URL = import.meta.env.VITE_API_URL;
+import useErrorRedirect from "../hooks/useErrorRedirects.tsx"; // adjust path
+import LoadingPage from "./loadingPage.tsx";
 
 const Sidebar = () => {
   const socket = useSocket();
   const { roomId } = useParams();
-  const navigate = useNavigate();
-  const [toggle, setToggle] = useState(false);
 
+  const [toggle, setToggle] = useState(false);
+  const [isHost, setIsHost] = useState(false);
   const [accessData, setAccessData] = useState<Record<string, AccessOptions>>(
     {}
   );
+  const info = userRoomInfo(roomId, socket);
+
+  const roomInfo = info?.roomInfo ?? { members: [], host: "", currUser: "" };
+  const inRoom = info?.inRoom ?? false;
+
+  useErrorRedirect(
+    inRoom,
+    "You are not in the room or the room does not exist."
+  );
+  const { leaveRoom, kickMember } = useRoom();
+  if (!inRoom) return <LoadingPage />;
+
   const handleLeaveMember = () => {
-    const token = localStorage.getItem("token");
-    const roomData = {
-      token: token,
-      roomId: roomId,
-    };
-    socket.emit(
-      "leave",
-      roomData,
-      (response: { status: string; error?: string }) => {}
-    );
-    navigate("/rooms");
+    if (roomId) leaveRoom(roomId);
   };
 
-  const handleKickMember = (member: string) => {
-    const token = localStorage.getItem("token");
-    const authenticationHeader = {
-      Authorization: token,
-    };
-    axios
-      .delete(`${API_URL}/database/api/room/kick`, {
-        headers: authenticationHeader,
-        data: { username: member, roomId: roomId },
-      })
-      .then((response) => {})
-      .catch((error) => {
-        console.log(error);
-      });
-    const roomData = {
-      roomId: roomId,
-    };
-    socket.emit("member-kicked", roomData);
-  };
-  const [members, setMembers] = useState<string[]>([]);
-  const [inRoom, setInRoom] = useState(true);
-
-  const [host, setHost] = useState("");
-  const [currUser, setCurrUser] = useState("");
-  const [isHost, setIsHost] = useState(false);
-
-  const getMembers = async () => {
-    const token = localStorage.getItem("token");
-    const authenticationHeader = {
-      Authorization: token,
-    };
-
-    const response = await axios.get(
-      `${
-        import.meta.env.VITE_API_URL
-      }/database/api/room/members?roomId=${roomId}`,
-      {
-        headers: authenticationHeader,
-      }
-    );
-    return response.data;
+  const handleKickMember = (username: string) => {
+    if (roomId) kickMember(roomId, username);
   };
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const data = await getMembers();
-        setInRoom(true);
-        setMembers(data.members);
-        setHost(data.host);
-        setCurrUser(data.currUser);
-      } catch (error) {
-        setInRoom(false);
-        console.error("Failed to fetch members", error);
-      }
-    };
-    fetchMembers();
-    socket.on("members-updated", fetchMembers);
-  }, []);
-
-  useEffect(() => {
-    setIsHost(host === currUser);
-  }, [currUser, host, members]);
+    setIsHost(roomInfo.host === roomInfo.currUser);
+  }, [roomInfo.currUser, roomInfo.host, roomInfo.members]);
 
   useEffect(() => {
     const updateOptions = async () => {
@@ -139,21 +88,21 @@ const Sidebar = () => {
     <div className="bg-gray-900 text-white w-64 min-h-screen p-4 flex flex-col space-y-6">
       {/* Host Name */}
       <div className="text-lg font-semibold border-b border-gray-700 pb-2">
-        Host: <span className="text-green-400">{host}</span>
+        Host: <span className="text-green-400">{roomInfo.host}</span>
       </div>
 
       {/* Room Members */}
       <div className="flex-1">
         <h2 className="text-md font-semibold mb-2">Room Members:</h2>
         <ul className="space-y-1 max-h-48 overflow-y-auto">
-          {members.map((member, index) => (
+          {roomInfo.members.map((member, index) => (
             <li
               key={index}
               className="bg-gray-800 p-2 rounded flex justify-between items-center"
             >
               <span>{member}</span>
 
-              {isHost && member !== host && (
+              {isHost && member !== roomInfo.host && (
                 <div className="flex gap-2 items-center">
                   <button
                     onClick={() => setToggle(!toggle)}

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSocket } from "../hooks/socketContext";
+import { useSocket } from "../context/socketContext";
 import { Editor, Tldraw, TLEventMapHandler, TLRecord } from "tldraw";
 import axios from "axios";
 

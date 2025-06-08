@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useSocket } from "../hooks/socketContext";
+import { useSocket } from "../context/socketContext";
 import { logEvent, LogLevel } from "../utils/logger";
 
 import TempCanvas from "./tempCanvas";

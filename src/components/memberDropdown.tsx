@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { SquarePen, Target } from "lucide-react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { useSocket } from "../hooks/socketContext.tsx";
+import { useSocket } from "../context/socketContext.tsx";
 
 type AccessOptions = {
   whiteboard: boolean;

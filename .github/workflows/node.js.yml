@@ -2,12 +2,12 @@ name: Backend CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
-  ROOT_PATH: /var/www/whiteboard  # ✅ Use a writable path like /var/www
+  ROOT_PATH: /var/www/whiteboard
 
 jobs:
   deploy-backend:

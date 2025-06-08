@@ -1,87 +1,38 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { logEvent, LogLevel } from "../utils/logger";
+import { useState } from "react";
+import { useAuth } from "../context/AuthProvider.js";
 import "./css/auth.css";
-import axios from "axios";
 
-const auth = () => {
-  const navigate = useNavigate();
+const Auth = () => {
+  const { login, register } = useAuth();
+
   const [isLoginPage, setIsLoginPage] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const goToRooms = () => {
-    try {
-      logEvent("CTA_Clicked", {
-        location: "Hero Section",
-        button: "Get Started",
-      });
-      navigate("/rooms");
-      logEvent("Navigation_Success", { to: "/rooms" });
-    } catch (error) {
-      logEvent(
-        "Navigation_Failure",
-        { to: "/rooms", error: getErrorMessage(error) },
-        LogLevel.ERROR
-      );
-    }
-  };
 
   const handleLogin = () => {
     if (isLoginPage) {
-      axios
-        .post(`${import.meta.env.VITE_API_URL}/database/api/user/login`, {
-          email: email,
-          password: password,
-        })
-        .then((response) => {
-          LogLevel.INFO;
-
-          if (response.data.token) {
-            localStorage.setItem("token", response.data.token);
-            navigate("/rooms");
-            LogLevel.INFO;
-          } else {
-            LogLevel.ERROR;
-            console.error("Token not found in response.");
-          }
-        })
-        .catch((error) => {
-          LogLevel.ERROR;
-          console.error("error :", error);
-        });
+      login(email, password);
     } else {
       setIsLoginPage(true);
     }
   };
+
   const handleRegister = () => {
     if (!isLoginPage) {
-      axios
-        .post(`${import.meta.env.VITE_API_URL}/database/api/user/register`, {
-          username: username,
-          email: email,
-          password: password,
-        })
-        .then((response) => {
-          LogLevel.INFO;
-        })
-        .catch((error) => {
-          LogLevel.ERROR;
-          console.error("error :", error);
-        });
+      register(username, email, password);
     } else {
       setIsLoginPage(false);
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-200 font-poppins">
       <div className="bg-white shadow-lg rounded-3xl flex flex-col md:flex-row w-[90%] max-w-5xl overflow-hidden">
-        {/* Left Box */}
         <div className="md:w-1/2 bg-blue-800 flex flex-col items-center justify-center p-8 text-white">
           <p className="text-2xl font-semibold font-mono">Be Verified</p>
         </div>
 
-        {/* Right Box */}
         <div className="md:w-1/2 p-10 flex flex-col justify-center">
           <div className="mb-6">
             <h2 className="text-3xl font-semibold">Welcome To CodeIn</h2>
@@ -130,7 +81,4 @@ const auth = () => {
   );
 };
 
-export default auth;
-function getErrorMessage(error: unknown) {
-  throw new Error("Function not implemented.");
-}
+export default Auth;

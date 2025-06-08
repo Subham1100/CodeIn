@@ -10,88 +10,59 @@ import { python } from "@codemirror/lang-python";
 
 import axios from "axios";
 import { logEvent, LogLevel } from "../utils/logger";
+import { generateNewCode, submitCode } from "../utils/codeEditUtils";
+import { useSocket } from "../context/socketContext";
+import { useParams } from "react-router-dom";
+import { useRoom } from "../context/RoomContext";
+import { runCode } from "../utils/codeEditUtils";
 type AccessOptions = {
   whiteboard: boolean;
   codeEditor: boolean;
   codeEditorOptions: boolean;
 };
-import { useSocket } from "../hooks/socketContext";
-import { useParams } from "react-router-dom";
+type Language = "cpp" | "java" | "python";
+type LanguageSol = "cppSol" | "javaSol" | "pythonSol";
+type BoilerplateCode = {
+  cpp: string;
+  python: string;
+  java: string;
+  cppSol: string;
+  javaSol: string;
+  pythonSol: string;
+};
 
 const CodeSection = () => {
   const socket = useSocket();
   const { roomId } = useParams();
-  const [cppValue, setCppValue] = useState(
-    `#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, C++!" << endl;\n  return 0;\n}`
-  );
-  const [javaValue, setJavaValue] = useState(
-    `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Hello, Java!");\n  }\n}`
-  );
-  const [pythonValue, setPythonValue] = useState(
-    `print("Hello, Python!")\nfor i in range(5):\n    print(i)`
-  );
   const [accessData, setAccessData] = useState<AccessOptions>({
     whiteboard: false,
     codeEditor: false,
     codeEditorOptions: false,
   });
-  const languageOptions = {
-    cpp: {
-      name: "C++",
-      extension: cpp(),
-      value: cppValue,
-    },
-    java: {
-      name: "Java",
-      extension: java(),
-      value: javaValue,
-    },
-    python: {
-      name: "Python",
-      extension: python(),
-      value: pythonValue,
-    },
-  };
 
-  const setters = {
-    cpp: setCppValue,
-    java: setJavaValue,
-    python: setPythonValue,
-  };
-  type BoilerplateCode = {
-    cpp: string;
-    python: string;
-    java: string;
-    cppSol: string;
-    javaSol: string;
-    pythonSol: string;
-  };
-
-  const [language, setLanguage] = useState<keyof typeof languageOptions>("cpp");
-  const [languageSol, setLanguageSol] =
-    useState<keyof BoilerplateCode>("cppSol");
-  const [code, setCode] = useState(languageOptions["cpp"].value);
-  const [responseUpdate, setResponseUpdate] = useState("");
-  const [expectedResponseUpdate, setExpectedResponseUpdate] = useState("");
+  const [language, setLanguage] = useState<Language>("cpp");
+  const [languageSol, setLanguageSol] = useState<LanguageSol>("cppSol");
   const [boilerplateCode, setBoilerplateCode] =
     useState<BoilerplateCode | null>(null);
+  const [code, setCode] = useState("");
+  const [responseUpdate, setResponseUpdate] = useState("");
+  const [expectedResponseUpdate, setExpectedResponseUpdate] = useState("");
+
   const [testCaseInput, setTestCaseInput] = useState("");
   const [SelectedProblem, setSelectedProblem] = useState(0);
   const [IsSubumit, setISsubmit] = useState(false);
   const [codeError, setCodeError] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { sendRoomCode, getRoomCode, getRoomOutput, sendRoomOutput } =
+    useRoom();
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (!boilerplateCode) return;
-
-    const lang = e.target.value as keyof typeof languageOptions;
+    const lang = e.target.value as Language;
     setLanguage(lang);
-
-    const codeForLang = boilerplateCode[lang];
-    if (codeForLang) {
-      setCode(codeForLang);
-      socket.emit("code-changed", codeForLang);
-    }
+    setLanguageSol(`${language}Sol`);
+    setCode(boilerplateCode[lang]);
+    socket.emit("code-changed", boilerplateCode[lang]);
   };
 
   const getLanguageExtension = () => {
@@ -106,79 +77,22 @@ const CodeSection = () => {
         return cpp();
     }
   };
-
-  const splitBoilerplate = (
-    boilerplate: string,
-    startMarker: string,
-    endMarker: string
-  ) => {
-    const startIdx = boilerplate.indexOf(startMarker);
-    const endIdx = boilerplate.indexOf(endMarker) + endMarker.length;
-
-    if (startIdx === -1 || endIdx === -1) {
-      throw new Error("Start or end marker not found in the boilerplate.");
-    }
-
-    const beforeStart = boilerplate.slice(0, startIdx);
-    const middle = boilerplate.slice(startIdx, endIdx);
-    const afterEnd = boilerplate.slice(endIdx);
-
-    return {
-      beforeStart, // code before startMarker
-      middle, // code between and including startMarker & endMarker
-      afterEnd, // code after endMarker
-    };
-  };
-  useEffect(() => {
-    setLanguageSol(`${language}Sol`);
-  }, [language]);
-
-  const generateNewCode = async () => {
-    if (!boilerplateCode) return;
-    try {
-      const boilerplateUser1 = boilerplateCode[languageSol];
-      const { beforeStart, middle, afterEnd } = splitBoilerplate(
-        boilerplateUser1,
-        "//-----------startofcode--------------------",
-        "//-----------endofcode--------------------"
-      );
-      const newCode = beforeStart + code + afterEnd;
-      return newCode;
-    } catch (error) {
-      logEvent("Error generating new code", error, LogLevel.ERROR);
-      throw error;
-    }
-  };
   const handleRunCode = async () => {
     setExpectedResponseUpdate("");
     setResponseUpdate("");
     setCodeError("");
+    if (!boilerplateCode) return;
     try {
-      const RunAPI =
-        SelectedProblem === 0
-          ? `${import.meta.env.VITE_API_URL}/docker/editor/run`
-          : `${import.meta.env.VITE_API_URL}/docker/run`;
-
-      const newCode = SelectedProblem == 0 ? code : await generateNewCode();
-
-      const response = await fetch(RunAPI, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          language,
-          code: newCode,
-          input: testCaseInput,
-          SelectedProblem: SelectedProblem,
-        }),
+      const newCode =
+        SelectedProblem == 0
+          ? code
+          : await generateNewCode(boilerplateCode[languageSol], code);
+      const response = await runCode({
+        language,
+        newCode,
+        testCaseInput,
+        SelectedProblem,
       });
-      logEvent(
-        "Received response from server",
-        { status: response.status }
-        // LogLevel.INFO
-      );
-
       const data = await response.json();
       if (data.ok) {
         if (SelectedProblem === 0) {
@@ -187,7 +101,6 @@ const CodeSection = () => {
             expectedResponseUpdate: data.output,
             responseUpdate: "",
           };
-
           socket.emit("code-response-changed", socketData);
         } else {
           const [userOutput, expectedOutput] = data.output.split("---SPLIT---");
@@ -204,7 +117,6 @@ const CodeSection = () => {
         }
       } else {
         setCodeError(data.output);
-        console.log(data.output);
 
         logEvent("Response was not OK", LogLevel.WARN);
       }
@@ -263,41 +175,27 @@ const CodeSection = () => {
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = parseInt(e.target.value);
-
     setSelectedProblem(selected);
   };
 
   const handleSubmitCode = async () => {
     setExpectedResponseUpdate("");
     setResponseUpdate("");
+    if (!boilerplateCode) return;
     try {
-      const newCode = await generateNewCode();
+      const newCode = await generateNewCode(boilerplateCode[languageSol], code);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/docker/submit`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            language,
-            code: newCode,
-            input: testCaseInput,
-            SelectedProblem: SelectedProblem,
-          }),
-        }
-      );
-      logEvent(
-        "Received response from server",
-        { status: response.status },
-        LogLevel.INFO
-      );
+      const response = await submitCode({
+        language,
+        newCode,
+        testCaseInput,
+        SelectedProblem,
+      });
       if (response) {
         const data = await response.json();
 
         const [expectedOutput, userOutput] = data.output.split("---SPLIT---");
-        console.log(expectedOutput, userOutput);
+
         setExpectedResponseUpdate(expectedOutput.trim());
         setResponseUpdate(userOutput.trim());
         const socketData = {
@@ -355,7 +253,6 @@ const CodeSection = () => {
   }, []);
 
   const handelCodeChange = (value: string) => {
-    setters[language](value);
     setCode(value);
     socket.emit("code-changed", value);
   };
@@ -367,87 +264,29 @@ const CodeSection = () => {
   };
 
   useEffect(() => {
-    const sendRoomCode = async () => {
-      const token = localStorage.getItem("token");
-      const authenticationHeader = {
-        Authorization: token,
-      };
-      try {
-        const response = await axios.put(
-          `${import.meta.env.VITE_API_URL}/database/api/room/roomCode`,
-          { roomId: roomId, roomCode: code },
-          {
-            headers: authenticationHeader,
-          }
-        );
-        return response.data;
-      } catch (error) {}
-    };
+    if (!roomId) return;
     const isDefaultCode = Object.values(defaultCodes).includes(code);
     if (!isDefaultCode) {
-      sendRoomCode();
+      sendRoomCode(roomId, code);
     }
   }, [code]);
 
   useEffect(() => {
-    const getRoomCode = async () => {
-      const token = localStorage.getItem("token");
-      const authenticationHeader = {
-        Authorization: token,
-      };
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/database/api/room/roomCode`,
-          {
-            params: {
-              roomId: roomId,
-            },
-            headers: authenticationHeader,
-          }
-        );
-        if (response.data.roomCode !== "") setCode(response.data.roomCode);
-      } catch (error) {}
+    const loadRoomDetails = async () => {
+      if (!roomId) return;
+      const responseRoomCode = await getRoomCode(roomId);
+      if (responseRoomCode !== "") setCode(responseRoomCode);
+
+      const responseRoomOutput = await getRoomOutput(roomId);
+      setExpectedResponseUpdate(responseRoomOutput);
     };
-    const getRoomOutput = async () => {
-      const token = localStorage.getItem("token");
-      const authenticationHeader = {
-        Authorization: token,
-      };
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/database/api/room/roomOutput`,
-          {
-            params: {
-              roomId: roomId,
-            },
-            headers: authenticationHeader,
-          }
-        );
-        setExpectedResponseUpdate(response.data.roomOutput);
-      } catch (error) {}
-    };
-    getRoomOutput();
-    getRoomCode();
+    loadRoomDetails();
   }, []);
 
   useEffect(() => {
-    const sendRoomOutput = async () => {
-      const token = localStorage.getItem("token");
-      const authenticationHeader = {
-        Authorization: token,
-      };
-      try {
-        const response = await axios.put(
-          `${import.meta.env.VITE_API_URL}/database/api/room/roomOutput`,
-          { roomId: roomId, roomOutput: expectedResponseUpdate },
-          {
-            headers: authenticationHeader,
-          }
-        );
-        return response.data;
-      } catch (error) {}
-    };
-    if (expectedResponseUpdate !== "") sendRoomOutput();
+    if (!roomId) return;
+    if (expectedResponseUpdate !== "")
+      sendRoomOutput(roomId, expectedResponseUpdate);
   }, [expectedResponseUpdate]);
 
   return (

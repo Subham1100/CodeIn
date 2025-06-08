@@ -1,95 +1,31 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import {
   Cross1Icon,
-  Cross2Icon,
   CrossCircledIcon,
-  Crosshair2Icon,
   DragHandleDots2Icon,
 } from "@radix-ui/react-icons";
 import CodeSection from "./CodeSection";
-
 import Sidebar from "../components/sidebar";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { useSocket } from "../hooks/socketContext.tsx";
-
 import TempWhiteboard from "./tempWhiteboard.tsx";
-import {
-  ArrowBigDownDashIcon,
-  ArrowBigLeftDashIcon,
-  AxeIcon,
-  DoorClosedIcon,
-  ForkKnifeCrossed,
-} from "lucide-react";
-
 const CodeIn = () => {
-  const [members, setMembers] = useState<string[]>([]);
-  const [inRoom, setInRoom] = useState(true);
-  const { roomId } = useParams();
-  const [host, setHost] = useState("");
-  const [currUser, setCurrUser] = useState("");
   const [showSideBar, setshowSideBar] = useState(true);
   const [showCodeSection, setShowCodeSection] = useState(true);
 
-  const getMembers = async () => {
-    const token = localStorage.getItem("token");
-    const authenticationHeader = {
-      Authorization: token,
-    };
-
-    const response = await axios.get(
-      `${
-        import.meta.env.VITE_API_URL
-      }/database/api/room/members?roomId=${roomId}`,
-      {
-        headers: authenticationHeader,
-      }
-    );
-    return response.data;
-  };
-  const socket = useSocket();
-  useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const data = await getMembers();
-        setInRoom(true);
-        setMembers(data.members);
-        setHost(data.host);
-        setCurrUser(data.currUser);
-      } catch (error) {
-        setInRoom(false);
-        console.error("Failed to fetch members", error);
-      }
-    };
-    fetchMembers();
-    socket.on("members-updated", fetchMembers);
-  }, []);
-
-  useEffect(() => {}, [currUser, host, members]);
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
         setshowSideBar(false);
       }
     };
-
-    // Run once on mount
     handleResize();
-
-    // Add event listener
     window.addEventListener("resize", handleResize);
-
-    // Cleanup on unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  if (!inRoom) {
-    return <div style={{ backgroundColor: "white", height: "100vh" }}></div>;
-  }
   const handleResize = (size: number) => {
     if (size <= 2) {
       setShowCodeSection(false);

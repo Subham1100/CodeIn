@@ -3,9 +3,6 @@
 @import "tailwindcss";
 
 @theme {
-  --text-button: 14px;
-  --text-title: clamp(3rem, calc(5vw + 1rem), 5vw);
-  --text-tiny: 0.8rem;
   --animate-slide-in: slide-in 1s ease-in-out;
   --animate-flip-vertical: flip-vertical 1s ease-in-out;
   --animate-delay: delay 6s ease-in-out;

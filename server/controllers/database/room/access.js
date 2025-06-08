@@ -15,8 +15,6 @@ export default async function (req, res) {
       return res.status(404).json({ message: "User not found" });
     }
     const userId = targetUser._id;
-    // console.log(newAccess);
-    // console.log(roomId);
     if (!roomId || !newAccess || !currUser) {
       return res
         .status(400)

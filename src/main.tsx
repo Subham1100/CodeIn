@@ -1,22 +1,24 @@
-import { StrictMode, useEffect } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
+import { BrowserRouter } from "react-router-dom"; // ✅ Add this
 import App from "./App.tsx";
+import { AuthProvider } from "./context/AuthProvider.tsx";
+import "./index.css";
 import LogRocket from "logrocket";
 
-// Check localStorage flag
 const shouldEnableLogRocket =
   localStorage.getItem("logrocketEnabled") === "false";
 
-// Conditionally initialize LogRocket
 if (shouldEnableLogRocket) {
   LogRocket.init("ocet2n/codein");
-} else {
-  console.log("LogRocket is disabled. Enable it by setting localStorage.");
 }
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );

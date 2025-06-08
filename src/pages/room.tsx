@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSocket } from "../hooks/socketContext.tsx";
+import { useSocket } from "../context/socketContext.tsx";
 import { logEvent, LogLevel } from "../utils/logger";
 import axios from "axios";
 
@@ -159,12 +159,12 @@ const Room = () => {
               onChange={(e) => setplaceholderName(e.target.value)}
               onBlur={() => {
                 if (placeholderName.trim() === "") {
-                  setplaceholderName("Enter Name"); // ✅ Restore text only if empty
+                  setplaceholderName("Enter Name");
                 }
               }}
               onFocus={() => {
                 if (placeholderName === "Enter Name") {
-                  setplaceholderName(""); // ✅ Clear only if it was the default text
+                  setplaceholderName("");
                 }
               }}
             />
