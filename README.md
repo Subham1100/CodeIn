@@ -45,14 +45,14 @@ CodeIn is a real-time collaborative platform where developers, instructors, and 
 
 ├── public/
 │ └── images/ Static assets (images, banners)
-│
+
 ├── src/ Frontend source code
 │ ├── components/ Reusable UI components
 │ ├── hooks/ Custom React hooks
 │ ├── context/ React context (Auth, Socket)
 │ ├── pages/ App pages and routes
 │ └── utils/ Helper functions and utilities
-│
+
 ├── server/ Backend (Node.js + WebSocket)
 │ ├── config/ Environment config and constants
 │ ├── controllers/ Request handlers
@@ -60,7 +60,7 @@ CodeIn is a real-time collaborative platform where developers, instructors, and 
 │ ├── routes/ Express API routes
 │ ├── services/ Business logic
 │ └── Dockerfile Container setup
-│
+
 ├── problemQuestions/ Set of coding problems with metadata
 
 ---
