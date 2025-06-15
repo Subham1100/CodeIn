@@ -90,21 +90,4 @@ Changes in code and whiteboard content are synced live across connected clients.
 
 ---
 
-## Docker Instructions (Backend)
 
-```bash
-# Build the Docker image
-docker build -t codein-backend .
-
-# Run the container
-docker run -p 5000:5000 codein-backend
-
-
-# License
-MIT License
-© 2025 CodeIn Team
-
-# Contribution
-We welcome contributions. To report bugs or request features, open an issue on GitHub. For major changes, please open a discussion first.
-
-```
