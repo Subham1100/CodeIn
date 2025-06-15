@@ -6,7 +6,7 @@ CodeIn is a real-time collaborative platform where developers, instructors, and 
 
 # Live Demo
 
-# Frontend: https://whiteboard-liart-phi.vercel.app/
+### Frontend: https://whiteboard-liart-phi.vercel.app/
 
 # Backend: Hosted on AWS EC2 (use environment variables to connect from frontend)
 
