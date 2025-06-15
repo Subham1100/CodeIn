@@ -1,0 +1,35 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+void fastIO() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+}
+//-----------startofcode--------------------
+bool isPalindrome(int x) {
+    if (x < 0) return false;
+    int original = x, reversed = 0;
+    while (x != 0) {
+        int digit = x % 10;
+        if (reversed > (INT_MAX - digit) / 10) return false;
+        reversed = reversed * 10 + digit;
+        x /= 10;
+    }
+    return original == reversed;
+}
+
+//-----------endofcode--------------------
+
+int main() {
+    fastIO();
+    int t;
+    cin >> t;
+    while (t--) {
+        int num;
+        cin >> num;
+        bool result = isPalindrome(num);
+        cout << (result ? "true" : "false") << endl;
+    }
+    return 0;
+}

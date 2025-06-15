@@ -15,15 +15,15 @@ export default async function boilerplate(req, res) {
     try {
       const cppPath = path.resolve(
         __dirname,
-        `../../temp/${SelectedProblem}/boilerplate/cpp.txt`
+        `../../problemQuestion/${SelectedProblem}/boilerplate/cpp.txt`
       );
       const javaPath = path.resolve(
         __dirname,
-        `../../temp/${SelectedProblem}/boilerplate/java.txt`
+        `../../problemQuestion/${SelectedProblem}/boilerplate/java.txt`
       );
       const pythonPath = path.resolve(
         __dirname,
-        `../../temp/${SelectedProblem}/boilerplate/python.txt`
+        `../../problemQuestion/${SelectedProblem}/boilerplate/python.txt`
       );
 
       const [cpp, java, python] = await Promise.all([
@@ -46,40 +46,46 @@ export default async function boilerplate(req, res) {
   try {
     const cppPath = path.resolve(
       __dirname,
-      `../../temp/${SelectedProblem}/boilerplate/cpp.txt`
+      `../../problemQuestion/${SelectedProblem}/boilerplate/cpp.txt`
     );
     const javaPath = path.resolve(
       __dirname,
-      `../../temp/${SelectedProblem}/boilerplate/java.txt`
+      `../../problemQuestion/${SelectedProblem}/boilerplate/java.txt`
     );
     const pythonPath = path.resolve(
       __dirname,
-      `../../temp/${SelectedProblem}/boilerplate/python.txt`
+      `../../problemQuestion/${SelectedProblem}/boilerplate/python.txt`
     );
     const cppSolutionPath = path.resolve(
       __dirname,
-      `../../temp/${SelectedProblem}/solution/cpp.txt`
+      `../../problemQuestion/${SelectedProblem}/solution/cpp.txt`
     );
     const javaSolutionPath = path.resolve(
       __dirname,
-      `../../temp/${SelectedProblem}/solution/java.txt`
+      `../../problemQuestion/${SelectedProblem}/solution/java.txt`
     );
     const pythonSolutionPath = path.resolve(
       __dirname,
-      `../../temp/${SelectedProblem}/solution/python.txt`
+      `../../problemQuestion/${SelectedProblem}/solution/python.txt`
+    );
+    const inputTextPath = path.resolve(
+      __dirname,
+      `../../problemQuestion/${SelectedProblem}/input.txt`
     );
 
-    const [cpp, java, python, cppSol, javaSol, pythonSol] = await Promise.all([
-      fs.readFile(cppPath, "utf-8"),
-      fs.readFile(javaPath, "utf-8"),
-      fs.readFile(pythonPath, "utf-8"),
-      fs.readFile(cppSolutionPath, "utf-8"),
-      fs.readFile(javaSolutionPath, "utf-8"),
-      fs.readFile(pythonSolutionPath, "utf-8"),
-    ]);
+    const [cpp, java, python, cppSol, javaSol, pythonSol, inputText] =
+      await Promise.all([
+        fs.readFile(cppPath, "utf-8"),
+        fs.readFile(javaPath, "utf-8"),
+        fs.readFile(pythonPath, "utf-8"),
+        fs.readFile(cppSolutionPath, "utf-8"),
+        fs.readFile(javaSolutionPath, "utf-8"),
+        fs.readFile(pythonSolutionPath, "utf-8"),
+        fs.readFile(inputTextPath, "utf-8"),
+      ]);
 
     return res.status(200).json({
-      data: { cpp, java, python, cppSol, javaSol, pythonSol },
+      data: { cpp, java, python, cppSol, javaSol, pythonSol, inputText },
     });
   } catch (error) {
     console.error(error);

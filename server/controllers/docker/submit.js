@@ -33,11 +33,11 @@ function handleSubmit(req, res) {
   if (language === "cpp") {
     const solutionPath = path.resolve(
       __dirname,
-      `../../../temp/${SelectedProblem}/solution/${language}.txt`
+      `../../../problemQuestion/${SelectedProblem}/solution/${language}.txt`
     );
     const testCasePath = path.resolve(
       __dirname,
-      `../../../temp/${SelectedProblem}/test_case.txt`
+      `../../../problemQuestion/${SelectedProblem}/test_case.txt`
     );
 
     const destinationSolutionPath = path.join(tempDir, "solution.cpp");
@@ -53,9 +53,47 @@ function handleSubmit(req, res) {
           /app/user_sol < /app/test_case.txt > /app/user_output.txt && \
           cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else if (language === "java") {
-    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "javac /app/Main.java && echo '${input}' | java -cp /app Main"`;
+    const solutionPath = path.resolve(
+      __dirname,
+      `../../../problemQuestion/${SelectedProblem}/solution/${language}.txt`
+    );
+    const testCasePath = path.resolve(
+      __dirname,
+      `../../../problemQuestion/${SelectedProblem}/test_case.txt`
+    );
+
+    const destinationSolutionPath = path.join(tempDir, "Solution.java");
+    const destinationTestCasePath = path.join(tempDir, "test_case.txt");
+
+    fs.copyFileSync(solutionPath, destinationSolutionPath);
+    fs.copyFileSync(testCasePath, destinationTestCasePath);
+
+    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "\
+        javac /app/Main.java && \
+        javac /app/Solution.java && \
+        java -cp /app Main < /app/test_case.txt > /app/main_output.txt && \
+        java -cp /app Solution < /app/test_case.txt > /app/user_output.txt && \
+        cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else if (language === "python") {
-    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "echo '${input}' | python3 /app/main.py"`;
+    const solutionPath = path.resolve(
+      __dirname,
+      `../../../problemQuestion/${SelectedProblem}/solution/${language}.txt`
+    );
+    const testCasePath = path.resolve(
+      __dirname,
+      `../../../problemQuestion/${SelectedProblem}/test_case.txt`
+    );
+
+    const destinationSolutionPath = path.join(tempDir, "solution.py");
+    const destinationTestCasePath = path.join(tempDir, "test_case.txt");
+
+    fs.copyFileSync(solutionPath, destinationSolutionPath);
+    fs.copyFileSync(testCasePath, destinationTestCasePath);
+
+    dockerCommand = `docker run --rm -v ${tempDir}:/app code-runner-image bash -c "\
+        python3 /app/main.py < /app/test_case.txt > /app/main_output.txt && \
+        python3 /app/solution.py < /app/test_case.txt > /app/user_output.txt && \
+        cat /app/main_output.txt && echo '---SPLIT---' && cat /app/user_output.txt"`;
   } else {
     return res.status(400).json({ output: "Unsupported language." });
   }

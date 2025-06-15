@@ -1,0 +1,40 @@
+def parse_string_to_array(input_str):
+    input_str = input_str.strip()[1:-1]  # remove [ and ]
+    if not input_str:
+        return []
+    return list(map(int, input_str.split(',')))
+
+#-----------startofcode--------------------
+
+def twoSum(nums, target):
+    mp = {}  # value -> index
+
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in mp:
+            return [mp[complement], i]  # ✅ return solution
+        mp[num] = i
+
+    return []
+
+#-----------endofcode--------------------
+def main():
+    t = 1
+    while t > 0:
+        s = input()  # input like: [2,7,11,15]
+        ar = parse_string_to_array(s)
+
+        target = int(input())
+        res = twoSum(ar, target)
+
+        if (len(res) != 2 or res[0] == res[1] or 
+            res[0] >= len(ar) or res[1] >= len(ar) or 
+            ar[res[0]] + ar[res[1]] != target):
+            print("Test Case Failed :")
+            print("[" + ",".join(map(str, ar)) + "]")
+        else:
+            print("Test Case Passed ✅")
+        t -= 1
+
+if __name__ == "__main__":
+    main()

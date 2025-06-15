@@ -86,6 +86,9 @@ const Sidebar = () => {
 
   return (
     <div className="bg-gray-900 text-white w-64 min-h-screen p-4 flex flex-col space-y-6">
+      <h1>
+        Room Code : <span className="">{roomId}</span>
+      </h1>
       {/* Host Name */}
       <div className="text-lg font-semibold border-b border-gray-700 pb-2">
         Host: <span className="text-green-400">{roomInfo.host}</span>
@@ -146,7 +149,7 @@ const Sidebar = () => {
       {/* Leave Room Button */}
       <button
         onClick={handleLeaveMember}
-        className="bg-red-600 hover:bg-red-700 transition p-2 rounded text-sm font-medium"
+        className="bg-red-600 hover:bg-red-700 transition p-2 rounded text-sm font-medium mb-10"
       >
         Leave Room
       </button>

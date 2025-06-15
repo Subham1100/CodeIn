@@ -3,39 +3,89 @@
 @import "tailwindcss";
 
 @theme {
-  --animate-slide-in: slide-in 1s ease-in-out;
-  --animate-flip-vertical: flip-vertical 1s ease-in-out;
-  --animate-delay: delay 6s ease-in-out;
 }
 body {
   font-family: "Merriweather", serif;
 }
-@keyframes slide-in {
-  0% {
-    transform: translateY(75px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(-7px);
-    opacity: 1;
-  }
+:root {
+  /*  change this for scaling  */
+  --m: 1.5rem;
+  --red: #ff6565;
+  --pink: #ff64f9;
+  --purple: #6b5fff;
+  --blue: #4d8aff;
+  --green: #5bff89;
+  --yellow: #ffee55;
+  --orange: #ff6d1b;
+}
+html {
+  scroll-behavior: smooth;
 }
 
-@keyframes flip-vertical {
-  0% {
-    transform: rotateX(-70deg);
-  }
-  100% {
-    transform: rotateX(0deg);
-  }
+button {
+  cursor: pointer;
 }
-@keyframes delay {
+
+.nav-bar button {
+  border: calc(0.08 * var(--m)) solid transparent;
+  position: relative;
+  color: #f3f3f3;
+  font-family: "Space Grotesk";
+  font-size: var(--m);
+  border-radius: calc(0.7 * var(--m));
+  padding: calc(0.5 * var(--m)) calc(1 * var(--m));
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+
+  background: linear-gradient(#121213, #121213),
+    linear-gradient(#121213 50%, rgba(18, 18, 19, 0.6) 80%, rgba(18, 18, 19, 0)),
+    linear-gradient(
+      90deg,
+      var(--orange),
+      var(--yellow),
+      var(--green),
+      var(--blue),
+      var(--purple),
+      var(--pink),
+      var(--red)
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box, border-box;
+  background-size: 200%;
+  animation: animate 2s infinite linear;
+}
+
+.nav-bar button::before {
+  content: "";
+  background: linear-gradient(
+    90deg,
+    var(--orange),
+    var(--yellow),
+    var(--green),
+    var(--blue),
+    var(--purple),
+    var(--pink),
+    var(--red)
+  );
+  height: 30%;
+  width: 60%;
+  position: absolute;
+  bottom: -20%;
+  z-index: -5;
+  background-size: 200%;
+  animation: animate 2s infinite linear;
+  filter: blur(calc(0.8 * var(--m)));
+}
+.nav-bar button:hover,
+.nav-bar button:hover::before {
+  animation: animate 0.5s infinite linear;
+}
+@keyframes animate {
   0% {
-    transform: translateY(300px);
-    opacity: 0;
+    background-position: 0;
   }
   100% {
-    transform: translateY(0);
-    opacity: 1;
+    background-position: 200%;
   }
 }

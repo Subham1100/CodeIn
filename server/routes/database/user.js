@@ -8,12 +8,14 @@ import {
   handleUserProfile,
   handleProfileUpdate,
   handleRegister,
+  handleRefresh,
 } from "../../controllers/database/user/index.js"; // Make sure to include .js extension if using ESM
 
 // POST requests
 router.post("/register", handleRegister);
 router.post("/login", handleLogin);
 router.post("/logout", handleLogout);
+router.post("/refresh", handleRefresh);
 
 // GET requests
 router.get(

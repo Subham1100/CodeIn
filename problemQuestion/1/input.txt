@@ -1,0 +1,2 @@
+Array inside [] for example [1,2,3] followed by int Target
+example : [1,2,3] 4 

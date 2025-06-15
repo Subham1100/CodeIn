@@ -20,15 +20,31 @@ export const splitBoilerplate = (
     afterEnd,
   };
 };
-export const generateNewCode = async (boilerplate: string, code: string) => {
+export const generateNewCode = async (
+  boilerplate: string,
+  code: string,
+  language: string
+) => {
   try {
-    const { beforeStart, middle, afterEnd } = splitBoilerplate(
-      boilerplate,
-      "//-----------startofcode--------------------",
-      "//-----------endofcode--------------------"
-    );
-    const newCode = beforeStart + code + afterEnd;
-    return newCode;
+    if (language === "python") {
+      const { beforeStart, middle, afterEnd } = splitBoilerplate(
+        boilerplate,
+        "#-----------startofcode--------------------",
+        "#-----------endofcode--------------------"
+      );
+
+      const newCode = beforeStart + code + afterEnd;
+      return newCode;
+    } else {
+      const { beforeStart, middle, afterEnd } = splitBoilerplate(
+        boilerplate,
+        "//-----------startofcode--------------------",
+        "//-----------endofcode--------------------"
+      );
+
+      const newCode = beforeStart + code + afterEnd;
+      return newCode;
+    }
   } catch (error) {
     throw error;
   }

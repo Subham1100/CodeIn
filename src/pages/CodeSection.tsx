@@ -29,6 +29,7 @@ type BoilerplateCode = {
   cppSol: string;
   javaSol: string;
   pythonSol: string;
+  inputText: string;
 };
 
 const CodeSection = () => {
@@ -60,10 +61,14 @@ const CodeSection = () => {
     if (!boilerplateCode) return;
     const lang = e.target.value as Language;
     setLanguage(lang);
-    setLanguageSol(`${language}Sol`);
-    setCode(boilerplateCode[lang]);
+
     socket.emit("code-changed", boilerplateCode[lang]);
   };
+  useEffect(() => {
+    if (!boilerplateCode) return;
+    setLanguageSol(`${language}Sol`);
+    setCode(boilerplateCode[language]);
+  }, [language]);
 
   const getLanguageExtension = () => {
     switch (language) {
@@ -81,16 +86,18 @@ const CodeSection = () => {
     setExpectedResponseUpdate("");
     setResponseUpdate("");
     setCodeError("");
+
     if (!boilerplateCode) return;
+
     try {
       const newCode =
         SelectedProblem == 0
           ? code
-          : await generateNewCode(boilerplateCode[languageSol], code);
+          : await generateNewCode(boilerplateCode[languageSol], code, language);
       const response = await runCode({
         language,
         newCode,
-        testCaseInput,
+        testCaseInput: "1 \n" + testCaseInput,
         SelectedProblem,
       });
       const data = await response.json();
@@ -157,11 +164,12 @@ const CodeSection = () => {
       const code = await fetchBoilerplates(SelectedProblem);
       if (code) {
         setBoilerplateCode(code);
+        if (!textareaRef.current) return;
+        textareaRef.current.value = code?.inputText || "";
       }
       setCode(code[language]); // Set the appropriate boilerplate code based on the problem
       socket.emit("code-changed", code[language]);
     };
-
     getBoilerplates();
   }, [SelectedProblem]);
 
@@ -183,7 +191,11 @@ const CodeSection = () => {
     setResponseUpdate("");
     if (!boilerplateCode) return;
     try {
-      const newCode = await generateNewCode(boilerplateCode[languageSol], code);
+      const newCode = await generateNewCode(
+        boilerplateCode[languageSol],
+        code,
+        language
+      );
 
       const response = await submitCode({
         language,
@@ -361,7 +373,7 @@ const CodeSection = () => {
                 <option value="4">
                   4. Remove Duplicates from Sorted Array
                 </option>
-                <option value="4">
+                <option value="5">
                   5. Find the Index of the First Occurrence in a String
                 </option>
               </select>
@@ -400,17 +412,20 @@ const CodeSection = () => {
                 id="inputTestCase"
                 ref={textareaRef}
                 name="inputTestCase"
-                className="w-full h-[40px] mr-4 resize bg-[#333333] p-2"
+                className="w-full  mr-4 resize bg-[#333333] h "
                 onChange={handleChangeTextArea}
                 disabled={!accessData.codeEditorOptions}
                 style={{
                   cursor: !accessData.codeEditor ? "not-allowed" : "auto",
                 }}
+                defaultValue={
+                  SelectedProblem === 0 ? "" : boilerplateCode?.inputText || ""
+                }
               />
             </div>
             {responseUpdate === expectedResponseUpdate &&
               responseUpdate !== "" && (
-                <div className="text-[#00e636]">Sucess</div>
+                <div className="text-[#00e636] ">Sucess</div>
               )}
             {responseUpdate === expectedResponseUpdate && IsSubumit && (
               <div className="text-[#00e636]">All test case passed.</div>
@@ -436,7 +451,7 @@ const CodeSection = () => {
                   <h3 className="text-lg font-semibold text-blue-400">
                     Expected Output:
                   </h3>
-                  <pre className="bg-black text-white p-2 rounded mt-1 overflow-auto whitespace-pre-wrap">
+                  <pre className="bg-black text-white p-2 rounded mt-1 overflow-auto whitespace-pre-wrap min-h-10">
                     {expectedResponseUpdate}
                   </pre>
                 </div>

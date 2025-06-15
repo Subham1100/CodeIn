@@ -1,0 +1,31 @@
+import java.util.*;
+
+public class Main {
+
+ //-----------startofcode--------------------
+    public static int removeDuplicates(int[] nums) {
+        if (nums.length == 0) return 0;
+        int k = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] != nums[k - 1]) {
+                nums[k] = nums[i];
+                k++;
+            }
+        }
+        return k;
+    }
+
+//-----------endofcode--------------------
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int t = Integer.parseInt(sc.nextLine());
+        while (t-- > 0) {
+            String s = sc.nextLine().replace("[", "").replace("]", "");
+            String[] parts = s.split(",");
+            int[] nums = Arrays.stream(parts).filter(p -> !p.isEmpty()).mapToInt(Integer::parseInt).toArray();
+            int k = removeDuplicates(nums);
+            System.out.println(k);
+
+        }
+    }
+}

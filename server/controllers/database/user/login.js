@@ -20,6 +20,7 @@ dotenv.config({ path: envPath });
 const PRIVATE_KEY = process.env.PRIVATE_KEY?.replace(/\\n/g, "\n");
 export default async function handleUserLogin(req, res) {
   const { email, password } = req.body;
+  const COOKIE_SECURE = process.env.COOKIE_SECURE === "true";
 
   if (!email || !password) {
     return res
@@ -48,20 +49,34 @@ export default async function handleUserLogin(req, res) {
 
     const token = jwt.sign(payload, PRIVATE_KEY, {
       algorithm: "RS256",
-      expiresIn: "1d",
+      expiresIn: "4h",
+    });
+    const refreshToken = jwt.sign({ sub: user._id }, PRIVATE_KEY, {
+      algorithm: "RS256",
+      expiresIn: "7d",
     });
 
     // You can optionally set session or cookie here
-    return res.status(200).json({
-      ok: true,
-      message: "Login successful",
-      token: "Bearer " + token,
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        email: user.email,
-      },
-    });
+    return res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: COOKIE_SECURE, // only HTTPS in prod
+        sameSite: "Lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      })
+      .status(200)
+      .json({
+        ok: true,
+        message: "Login successful",
+        token: "Bearer " + token,
+        refreshToken: refreshToken,
+
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          email: user.email,
+        },
+      });
   } catch (err) {
     console.error(err);
     return res

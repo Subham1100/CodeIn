@@ -4,3 +4,4 @@ export { default as CodeIn } from "./codeIn";
 export { default as Auth } from "./auth";
 export { default as TempHomepage } from "./tempHomepage";
 export { default as CodeSection } from "./CodeSection";
+export { default as Docs } from "./docs";

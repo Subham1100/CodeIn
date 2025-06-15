@@ -1,0 +1,9 @@
+#-----------startofcode--------------------
+def strStr(haystack: str, needle: str) -> int:
+    return haystack.find(needle)
+#-----------endofcode--------------------
+t = int(input())
+for _ in range(t):
+    haystack = input().strip()
+    needle = input().strip()
+    print(strStr(haystack, needle))

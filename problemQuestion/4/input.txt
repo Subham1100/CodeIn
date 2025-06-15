@@ -1,0 +1,2 @@
+int size and array inside []
+exapmle 4 [1,1,2,2]

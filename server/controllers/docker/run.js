@@ -31,7 +31,7 @@ function handleRun(req, res) {
   if (language === "cpp") {
     const solutionPath = path.resolve(
       __dirname,
-      `../../../temp/${SelectedProblem}/solution/${language}.txt`
+      `../../../problemQuestion/${SelectedProblem}/solution/${language}.txt`
     );
     const destinationPath = path.join(tempDir, "solution.cpp");
     fs.copyFileSync(solutionPath, destinationPath);
@@ -45,7 +45,7 @@ function handleRun(req, res) {
   } else if (language === "java") {
     const solutionPath = path.resolve(
       __dirname,
-      `../../../temp/${SelectedProblem}/solution/${language}.txt`
+      `../../../problemQuestion/${SelectedProblem}/solution/${language}.txt`
     );
     const destinationPath = path.join(tempDir, "solution.java");
 
@@ -58,7 +58,7 @@ function handleRun(req, res) {
   } else if (language === "python") {
     const solutionPath = path.resolve(
       __dirname,
-      `../../../temp/${SelectedProblem}/solution/${language}.txt`
+      `../../../problemQuestion/${SelectedProblem}/solution/${language}.txt`
     );
     const destinationPath = path.join(tempDir, "solution.py");
 

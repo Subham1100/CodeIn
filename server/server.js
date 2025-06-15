@@ -8,6 +8,8 @@ const envPath = path.resolve(
   path.dirname(new URL(import.meta.url).pathname),
   "../.env"
 );
+import cookieParser from "cookie-parser";
+app.use(cookieParser());
 
 dotenv.config({ path: envPath });
 
@@ -16,13 +18,14 @@ const allowedOrigins = [
   "whiteboard-git-main-subham1100s-projects.vercel.app",
   "whiteboard-lc1uwhja8-subham1100s-projects.vercel.app",
   "whiteboard-subham1100s-projects.vercel.app",
+  "http://localhost:5000",
 ];
 
 //cors
 import cors from "cors";
 app.use(
   cors({
-    origin: "*", // Match your frontend port
+    origin: allowedOrigins, // Match your frontend port
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
