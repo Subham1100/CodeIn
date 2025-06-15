@@ -1,9 +1,9 @@
 import User from "../../../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import fs from "fs";
+
 import path from "path";
-import { fileURLToPath } from "url";
+
 import dotenv from "dotenv";
 
 const envPath = path.resolve(
@@ -21,6 +21,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY?.replace(/\\n/g, "\n");
 export default async function handleUserLogin(req, res) {
   const { email, password } = req.body;
   const COOKIE_SECURE = process.env.COOKIE_SECURE === "true";
+  const sameSite = process.env.SAMESITE;
 
   if (!email || !password) {
     return res
@@ -61,7 +62,7 @@ export default async function handleUserLogin(req, res) {
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: COOKIE_SECURE, // only HTTPS in prod
-        sameSite: "Lax",
+        sameSite: sameSite,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       })
       .status(200)

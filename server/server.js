@@ -4,58 +4,47 @@ const app = express();
 app.use(express.json());
 import path from "path";
 import dotenv from "dotenv";
+import cors from "cors";
 const envPath = path.resolve(
   path.dirname(new URL(import.meta.url).pathname),
   "../.env"
 );
-import cookieParser from "cookie-parser";
-app.use(cookieParser());
 
 dotenv.config({ path: envPath });
-
-const allowedOrigins = [
-  "whiteboard-liart-phi.vercel.app",
-  "whiteboard-git-main-subham1100s-projects.vercel.app",
-  "whiteboard-lc1uwhja8-subham1100s-projects.vercel.app",
-  "whiteboard-subham1100s-projects.vercel.app",
-  "http://localhost:5000",
-];
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
 //cors
-import cors from "cors";
+
 app.use(
   cors({
-    origin: allowedOrigins, // Match your frontend port
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-  res.header("Access-Control-Allow-Origin: *");
-  res.header(
-    "Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS"
-  );
-  res.header(
-    "Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token"
-  );
-  next();
-});
+// app.use((req, res, next) => {
+//   const origin = req.headers.origin;
 
-app.options("/run", cors()); // Handle preflight explicitly
+//   if (allowedOrigins.includes(origin)) {
+//     res.setHeader("Access-Control-Allow-Origin", origin);
+//     res.setHeader("Access-Control-Allow-Credentials", "true");
+//     res.setHeader(
+//       "Access-Control-Allow-Methods",
+//       "GET, POST, PUT, DELETE, OPTIONS"
+//     );
+//     res.setHeader(
+//       "Access-Control-Allow-Headers",
+//       "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//     );
+//   }
+
+//   next();
+// });
+
+import cookieParser from "cookie-parser";
+app.use(cookieParser());
 
 //config
 import "./config/database.js";
@@ -68,8 +57,6 @@ app.use(passport.initialize());
 //services
 import { createServer } from "http";
 import setupSocket from "./services/socketHandler.js";
-
-import fs from "fs";
 
 // const sslOptions = {
 //   key: fs.readFileSync(
