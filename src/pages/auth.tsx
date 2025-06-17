@@ -133,6 +133,12 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center  font-poppins bg-gradient-to-b from-[#12d087be] via-[#62f0cf]  to-[#05372b]">
+      <div className="fixed inset-0 z-60 bg-black text-white flex items-center justify-center text-center px-4 md:hidden">
+        <p className="text-lg font-semibold">
+          Currently not available for mobile screen
+        </p>
+      </div>
+
       <div className="bg-white shadow-lg rounded-3xl flex flex-col md:flex-row w-[60%] max-w-5xl overflow-hidden left-0 h-120">
         <div
           className={`md:w-1/2  flex flex-col items-center justify-center p-8 text-white transition-colors duration-800 ease-in-out ${

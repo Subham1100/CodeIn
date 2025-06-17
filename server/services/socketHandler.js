@@ -10,18 +10,13 @@ const envPath = path.resolve(
 );
 
 dotenv.config({ path: envPath });
-const allowedOrigins = [
-  "https://whiteboard-liart-phi.vercel.app",
-  "https://whiteboard-git-main-subham1100s-projects.vercel.app",
-  "https://whiteboard-lc1uwhja8-subham1100s-projects.vercel.app",
-  "https://whiteboard-subham1100s-projects.vercel.app",
-  "http://localhost:5000",
-];
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
 export default function (server) {
   const io = new Server(server, {
     cors: {
       origin: allowedOrigins, // Match frontend port
+      credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE"],
     },
   });

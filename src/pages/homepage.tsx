@@ -152,9 +152,14 @@ const HomePage = () => {
   };
 
   return (
-    <div className="main-container p-6 bg-gradient-to-b from-[#a2f0d2be] via-[#62f0cf]  to-[#16352e] ">
+    <div className="main-container p-6 bg-gradient-to-b from-[#a2f0d2be] via-[#62f0cf]  to-[#16352e]  ">
+      <div className="fixed inset-0 z-60 bg-black text-white flex items-center justify-center text-center px-4 md:hidden ">
+        <p className="text-lg font-semibold">
+          Currently not available for mobile screen
+        </p>
+      </div>
       {/* <div className="absolute bg-[#1cdcd5] h-200 w-200 rounded-full blur-2xl opacity-20 -left-70 -top-70"></div> */}
-      <div className="nav-bar w-full  flex items-center justify-between ">
+      <div className="nav-bar w-full sticky top-0 backdrop-blur-lg z-50 flex items-center justify-between ">
         <div className="nav-left-side w-3/5 flex justify-between ">
           <div className="logo text-6xl ">
             <a href="/">Code-In</a>
