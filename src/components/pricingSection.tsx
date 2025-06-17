@@ -17,15 +17,15 @@ interface PricingSectionProps {
 const PricingSection: React.FC<PricingSectionProps> = ({ sliderItems }) => {
   const navigate = useNavigate();
   return (
-    <div className="features flex  gap-20 p-10  items-center justify-center bg-[#147558] rounded-2xl">
+    <div className="features flex  gap-20 p-10  items-center justify-center  rounded-2xl">
       {sliderItems.map((plan, idx) => (
         <div
           key={idx}
           className="bg-white flex flex-col  px-10 py-2 rounded-2xl gap-4 items-center"
           style={{
-            border: plan.mostPopular ? "2px solid #4CAF50" : "none",
+            border: plan.mostPopular ? "2px solid #123123" : "none",
             height: plan.mostPopular ? "470px" : "410px",
-            background: plan.mostPopular ? "#99dd96" : "",
+            background: plan.mostPopular ? "#e2cbb0" : "#aeb6a0",
           }}
         >
           <h1

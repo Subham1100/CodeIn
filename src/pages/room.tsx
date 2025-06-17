@@ -1,13 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSocket } from "../context/socketContext.tsx";
 import { logEvent, LogLevel } from "../utils/logger";
 import axios from "axios";
-import JoinRoom from "/images/join_room.jpeg";
-import CreateRoom from "/images/create_room.jpg";
-
-import Feature from "../components/feature";
-import { preventDefault } from "tldraw";
 
 const Room = () => {
   const [placeholderRoomId, setplaceholderRoomId] = useState("Room Code");
@@ -105,13 +100,10 @@ const Room = () => {
   };
 
   return (
-    <div className=" relative p-6 bg-gradient-to-b from-[#a2f0d2be] via-[#62f0cf] to-[#16352e] min-h-screen flex flex-col items-center justify-center">
-      <div className="absolute bg-[#70da7c] rounded-full w-200 h-200 -left-80 opacity-20"></div>
-      <div className="absolute bg-[#70a5da] rounded-full w-200 h-200 -right-80 opacity-20"></div>
-      <div className="absolute bg-[#f905cc] rounded-full w-200 h-200  -z-2"></div>
+    <div className=" relative p-6  bg-gradient-to-b from-[#faf0e6] via-[#faf0e6]  to-[#ba96a6] min-h-screen flex flex-col items-center justify-center">
       <p className="mb-10 text-7xl">CodeIn</p>
 
-      <div className="room-options flex flex-col w-2/7 gap-5 bg-[#196248] p-5 rounded-2xl justify-center items-center">
+      <div className="room-options flex flex-col w-2/7 gap-5 bg-[#4b3b42] p-5 rounded-2xl justify-center items-center">
         <p className=" text-3xl font-bold text-gray-200">Room</p>
         <form onSubmit={handleSubmit}>
           <input

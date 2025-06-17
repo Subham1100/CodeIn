@@ -26,6 +26,18 @@ button {
   cursor: pointer;
 }
 
+.main-container {
+  background: linear-gradient(
+    to bottom,
+    #faf0e6 0%,
+    #fff0db 20%,
+    #eed9c4 40%,
+    #e4d5b7 60%,
+    #c3b8af 80%,
+    #faf0e6 100%
+  );
+}
+
 .nav-bar button {
   border: calc(0.08 * var(--m)) solid transparent;
   position: relative;

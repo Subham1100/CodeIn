@@ -132,7 +132,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center  font-poppins bg-gradient-to-b from-[#12d087be] via-[#62f0cf]  to-[#05372b]">
+    <div className="min-h-screen flex items-center justify-center  font-poppins bg-gradient-to-b from-[#faf0e6] via-[#faf0e6]  to-[#ba96a6]">
       <div className="fixed inset-0 z-60 bg-black text-white flex items-center justify-center text-center px-4 md:hidden">
         <p className="text-lg font-semibold">
           Currently not available for mobile screen
@@ -142,11 +142,11 @@ const Auth = () => {
       <div className="bg-white shadow-lg rounded-3xl flex flex-col md:flex-row w-[60%] max-w-5xl overflow-hidden left-0 h-120">
         <div
           className={`md:w-1/2  flex flex-col items-center justify-center p-8 text-white transition-colors duration-800 ease-in-out ${
-            isLoginPage ? "bg-[#327d5e]" : "bg-[#32787d]"
+            isLoginPage ? "bg-[#b3a79b]" : "bg-[#4b3b42]"
           }`}
         >
           {isLoginPage ? (
-            <div className="flex flex-col gap-5 items-center">
+            <div className="flex flex-col gap-5 items-center text-black">
               <p className="text-3xl">New here?</p>
               <p className="font-medium tracking-wide text-center">
                 Get exclusive access to our coolest features sign up now and
@@ -154,7 +154,7 @@ const Auth = () => {
               </p>
               <button
                 onClick={toggleForm}
-                className="p-4 w-1/2 bg-[#164739] text-white rounded-2xl"
+                className="p-4 w-1/2 bg-[#3c3630d6] text-white rounded-2xl"
               >
                 Register
               </button>
@@ -168,7 +168,7 @@ const Auth = () => {
               </p>
               <button
                 onClick={toggleForm}
-                className="p-4 w-1/2 bg-[#164739] text-white rounded-2xl"
+                className="p-4 w-1/2 bg-[#8d757fa1] text-white rounded-2xl"
               >
                 Login
               </button>
@@ -176,7 +176,10 @@ const Auth = () => {
           )}
         </div>
 
-        <div className="md:w-1/2 p-10 flex flex-col justify-center bg-[#b2edd496] ">
+        <div
+          className="md:w-1/2 p-10 flex flex-col justify-center  "
+          style={{ backgroundColor: isLoginPage ? "#d3c4b5ae" : "#b09da586" }}
+        >
           <div className="mb-6">
             <h2 className="text-4xl font-semibold">Welcome To CodeIn</h2>
             <p className="text-gray-600">{textConfirm}</p>
@@ -221,7 +224,7 @@ const Auth = () => {
             <button
               type="submit"
               className={` text-white w-full py-3 rounded-2xl mb-3 transition-colors duration-800 ease-in-out ${
-                isLoginPage ? "bg-[#327d5e]" : "bg-[#32787d]"
+                isLoginPage ? "bg-[#3c3630d6]" : "bg-[#4b3b42]"
               }`}
             >
               {isLoginPage ? "Login" : "Register"}
