@@ -15,48 +15,12 @@ interface UseCasesSliderProps {
 
 const UseCasesSlider: React.FC<UseCasesSliderProps> = ({ sliderItems }) => {
   const [option, setOption] = useState(0);
-  const [displayedTitle, setDisplayedTitle] = useState(sliderItems[0].title);
-
-  const animationRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const nextTitle = sliderItems[option].title;
-    let step = 0;
-    const totalSteps = 100;
-
-    // Clear any running animation
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-
-    function animateTitle() {
-      const progress = step / totalSteps;
-      const ease = progress * progress * (3 - 2 * progress);
-      const length = Math.ceil(nextTitle.length * ease);
-      const partial = nextTitle.substring(0, length);
-      setDisplayedTitle(partial);
-
-      if (step < totalSteps) {
-        step++;
-        animationRef.current = requestAnimationFrame(animateTitle);
-      }
-    }
-
-    animateTitle();
-
-    // Cleanup
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [option, sliderItems]);
   useEffect(() => {
     const interval = setInterval(() => {
       setOption((prev) => (prev === 3 ? 0 : prev + 1));
     }, 3000);
 
-    return () => clearInterval(interval); // cleanup
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -66,7 +30,7 @@ const UseCasesSlider: React.FC<UseCasesSliderProps> = ({ sliderItems }) => {
           className="flex justify-center font-bold text-6xl mb-10 transition-all"
           style={{ color: sliderItems[option].title_color }}
         >
-          <span>{displayedTitle}</span>
+          <span className="typing-text">{sliderItems[option].title}</span>
         </h1>
         <div className="flex  items-center justify-center gap-10">
           <img

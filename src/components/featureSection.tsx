@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React from "react";
 
 interface SliderItem {
   title: string;
@@ -16,15 +15,15 @@ interface FeaturesSectionProps {
 
 const FeaturesSection: React.FC<FeaturesSectionProps> = ({ sliderItems }) => {
   return (
-    <>
-      <p className="feature-section  text-7xl flex  justify-center items-center p-7">
+    <div className="flex">
+      <p className="feature-section bg-red-500 text-7xl flex  justify-center items-center p-7">
         Features
       </p>
-      <div className="features flex  gap-20 p-10 ">
+      <div className="features flex flex-col gap-20 p-10 bg-blue-600 overflow-scroll h-[500px]">
         {sliderItems.map((feature, idx) => (
           <div
             key={idx}
-            className="bg-[#e7cbb1] flex flex-col w-1/2 p-10 rounded-2xl"
+            className="bg-[#e7cbb1] flex flex-col w-1/2 p-10 rounded-2xl "
           >
             <img src={feature.image_src} className="h-20 w-40 " />
             <h1 className="mt-7 text-2xl font-bold">{feature.title}</h1>
@@ -32,7 +31,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({ sliderItems }) => {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

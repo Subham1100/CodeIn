@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { logEvent, LogLevel } from "../utils/logger";
+import { logEvent } from "../utils/logger";
 import UseCasesSlider from "../components/useCasesSlider";
 import FeaturesSection from "../components/featureSection";
 import PricingSection from "../components/pricingSection";
 import About from "../components/about";
 import Team from "../components/team";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Footer from "../components/footer";
 import HeroImage from "/images/Code_typing_cuate.svg";
 
@@ -40,11 +40,11 @@ const HomePage = () => {
       navigate("/auth");
       logEvent("Navigation_Success", { to: "/auth" });
     } catch (error) {
-      logEvent(
-        "Navigation_Failure",
-        { to: "/auth", error: getErrorMessage(error) },
-        LogLevel.ERROR
-      );
+      // logEvent(
+      //   "Navigation_Failure",
+      //   { to: "/auth", error: getErrorMessage(error) },
+      //   LogLevel.ERROR
+      // );
     }
   };
   const UseCaseData = [
@@ -149,8 +149,6 @@ const HomePage = () => {
     { id: "team-section", color: "#faf0e6", label: "Section 6" },
   ];
 
-  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
-
   return (
     <div>
       <div className="main-container p-6 ">
@@ -160,7 +158,7 @@ const HomePage = () => {
           </p>
         </div>
         {/* <div className="absolute bg-[#1cdcd5] h-200 w-200 rounded-full blur-2xl opacity-20 -left-70 -top-70"></div> */}
-        <div className="nav-bar w-full sticky top-0 backdrop-blur-3xl  flex items-center justify-between">
+        <div className="nav-bar w-full sticky top-0 backdrop-blur-3xl  flex items-center justify-between z-50">
           <div className="nav-left-side w-3/5 flex justify-between ">
             <div className="logo text-6xl ">
               <a href="/">Code-In</a>
@@ -241,14 +239,7 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        <div
-          className="hero-section  flex  gap-10"
-          id="hero-section"
-          data-color={sections[0].color}
-          ref={(el) => {
-            sectionRefs.current[0] = el;
-          }}
-        >
+        <div className="hero-section  flex  gap-10" id="hero-section">
           <div className="hero-sectoin-elements w-1/2 flex flex-col gap-4 p-10">
             <div className="hero-text-h1 text-6xl mt-30 ">
               Collaborate
@@ -275,31 +266,16 @@ const HomePage = () => {
         <div
           className="usecase-section  mt-50 flex flex-col items-center gap-2.5"
           id="usecase-section"
-          data-color={sections[1].color}
-          ref={(el) => {
-            sectionRefs.current[1] = el;
-          }}
         >
           <UseCasesSlider sliderItems={UseCaseData} />
         </div>
-        <div
-          className="features-section mt-37 "
-          id="features-section"
-          data-color={sections[2].color}
-          ref={(el) => {
-            sectionRefs.current[2] = el;
-          }}
-        >
+        <div className="features-section mt-37 " id="features-section">
           <FeaturesSection sliderItems={FeatureData} />
         </div>
 
         <div
           className="pricing-section flex flex-col items-center gap-5  mt-20"
           id="pricing-section"
-          data-color={sections[3].color}
-          ref={(el) => {
-            sectionRefs.current[3] = el;
-          }}
         >
           <p className="text-6xl flex justify-center items-center p-5">
             Pricing Plans
@@ -310,21 +286,10 @@ const HomePage = () => {
         <div
           className="about-section mt-20  rounded-2xl px-10 py-2"
           id="about-section"
-          data-color={sections[4].color}
-          ref={(el) => {
-            sectionRefs.current[4] = el;
-          }}
         >
           <About />
         </div>
-        <div
-          className="team-section mt-20"
-          id="team-section"
-          data-color={sections[5].color}
-          ref={(el) => {
-            sectionRefs.current[5] = el;
-          }}
-        >
+        <div className="team-section mt-20" id="team-section">
           <Team />
         </div>
         <div className="footer">
@@ -334,7 +299,5 @@ const HomePage = () => {
     </div>
   );
 };
+
 export default HomePage;
-function getErrorMessage(error: unknown) {
-  throw new Error("Function not implemented.");
-}

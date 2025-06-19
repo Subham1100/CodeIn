@@ -1,6 +1,6 @@
-import { CheckCheck, icons, TicketCheck, TicketPlus } from "lucide-react";
-import React, { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { TicketCheck, TicketPlus } from "lucide-react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface SliderItem {
   name: string;
@@ -17,14 +17,13 @@ interface PricingSectionProps {
 const PricingSection: React.FC<PricingSectionProps> = ({ sliderItems }) => {
   const navigate = useNavigate();
   return (
-    <div className="features flex  gap-20 p-10  items-center justify-center  rounded-2xl">
+    <div className=" relative flex  gap-20 px-10 py-20  items-center justify-center  rounded-2xl border-2 ">
+      <div className="absolute inset-0 backdrop-blur-3xl bg-[#783612] rounded-2xl border-2 z-0" />
       {sliderItems.map((plan, idx) => (
         <div
           key={idx}
-          className="bg-white flex flex-col  px-10 py-2 rounded-2xl gap-4 items-center"
+          className="bg-white flex flex-col  px-10 pb-10 rounded-2xl gap-10 items-center transition-transform duration-400 transform hover:-translate-y-4 hover:shadow-2xl shadow-amber-200 hover:border-4  "
           style={{
-            border: plan.mostPopular ? "2px solid #123123" : "none",
-            height: plan.mostPopular ? "470px" : "410px",
             background: plan.mostPopular ? "#e2cbb0" : "#aeb6a0",
           }}
         >

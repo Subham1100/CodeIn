@@ -101,3 +101,25 @@ button {
     background-position: 200%;
   }
 }
+
+.typing-text {
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+  width: 18em;
+  height: 1.5em;
+  animation: typing 3s infinite;
+  text-align: center;
+}
+
+@keyframes typing {
+  0% {
+    width: 0%;
+  }
+  80% {
+    width: 95%;
+  }
+  100% {
+    width: 100%;
+  }
+}
