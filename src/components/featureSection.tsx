@@ -15,11 +15,11 @@ interface FeaturesSectionProps {
 
 const FeaturesSection: React.FC<FeaturesSectionProps> = ({ sliderItems }) => {
   return (
-    <div className="flex">
+    <div className="">
       <p className="feature-section  text-7xl flex  justify-center items-center p-7">
         Features
       </p>
-      <div className="features flex flex-col gap-20 p-10 overflow-scroll h-[500px]">
+      <div className="features flex  gap-20 p-10 overflow-scroll h-[500px]">
         {sliderItems.map((feature, idx) => (
           <div
             key={idx}
