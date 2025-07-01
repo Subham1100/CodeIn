@@ -38,7 +38,7 @@ button {
   );
 }
 
-.nav-bar button {
+.hero-button button {
   border: calc(0.08 * var(--m)) solid transparent;
   position: relative;
   color: #f3f3f3;
@@ -68,7 +68,7 @@ button {
   animation: animate 2s infinite linear;
 }
 
-.nav-bar button::before {
+.hero-button button::before {
   content: "";
   background: linear-gradient(
     90deg,
@@ -89,8 +89,8 @@ button {
   animation: animate 2s infinite linear;
   filter: blur(calc(0.8 * var(--m)));
 }
-.nav-bar button:hover,
-.nav-bar button:hover::before {
+.hero-button button:hover,
+.hero-button button:hover::before {
   animation: animate 0.5s infinite linear;
 }
 @keyframes animate {

@@ -15,19 +15,21 @@ interface FeaturesSectionProps {
 
 const FeaturesSection: React.FC<FeaturesSectionProps> = ({ sliderItems }) => {
   return (
-    <div className="">
-      <p className="feature-section  text-7xl flex  justify-center items-center p-7">
+    <div className="w-full overflow-hidden">
+      <p className="feature-section text-4xl sm:text-5xl md:text-6xl lg:text-7xl flex justify-center items-center p-7">
         Features
       </p>
-      <div className="features flex  gap-20 p-10 overflow-scroll h-[500px] scroll">
+      <div className="features flex flex-col md:flex-row md:flex-wrap gap-10 md:gap-10 p-4 md:p-10 w-full">
         {sliderItems.map((feature, idx) => (
           <div
             key={idx}
-            className="bg-[#e7cbb1] flex flex-col w-1/2 p-10 rounded-2xl "
+            className="bg-[#e7cbb1] flex flex-col w-full md:w-[48%] p-6 md:p-10 rounded-2xl"
           >
-            <img src={feature.image_src} className="h-20 w-40 " />
-            <h1 className="mt-7 text-2xl font-bold">{feature.title}</h1>
-            <h2 className="mt-2 text-sm">{feature.description}</h2>
+            <img src={feature.image_src} className="h-20 w-40" />
+            <h1 className="mt-5 md:mt-7 text-xl md:text-2xl font-bold">
+              {feature.title}
+            </h1>
+            <h2 className="mt-2 text-sm md:text-base">{feature.description}</h2>
           </div>
         ))}
       </div>

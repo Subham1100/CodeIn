@@ -5,32 +5,12 @@ import FeaturesSection from "../components/featureSection";
 import PricingSection from "../components/pricingSection";
 import About from "../components/about";
 import Team from "../components/team";
-import { useEffect, useRef, useState } from "react";
+import NavBar from "../components/navBar";
 import Footer from "../components/footer";
 import HeroImage from "/images/Code_typing_cuate.svg";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [toggle, setToggle] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const dropdownRef2 = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        dropdownRef2 &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !dropdownRef2.current?.contains(event.target as Node)
-      ) {
-        setToggle(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const handleGetStarted = () => {
     try {
       logEvent("CTA_Clicked", {
@@ -114,6 +94,15 @@ const HomePage = () => {
       image_src: "/images/whiteboard.svg",
       color: "#8589A7",
     },
+    {
+      title: "Host-Controlled Access Permissions",
+      description_color: "#121213",
+      title_color: "#4A3F35",
+      description:
+        "Maintain full control over your collaborative sessions. Hosts can manage who can view, edit, or run code and whiteboard, ensuring a secure and focused collaboration environment.",
+      image_src: "/images/host-control.svg",
+      color: "#F4EDE4",
+    },
   ];
 
   const PricingData = [
@@ -142,148 +131,75 @@ const HomePage = () => {
 
   return (
     <div>
-      <div className="main-container p-6 ">
-        <div className="fixed inset-0  bg-black text-white flex items-center justify-center text-center px-4 md:hidden  z-90">
-          <p className="text-lg font-semibold">
-            Currently not available for mobile screen
-          </p>
-        </div>
-        {/* <div className="absolute bg-[#1cdcd5] h-200 w-200 rounded-full blur-2xl opacity-20 -left-70 -top-70"></div> */}
-        <div className="nav-bar w-full sticky top-0 backdrop-blur-3xl  flex items-center justify-between z-50">
-          <div className="nav-left-side w-3/5 flex justify-between ">
-            <div className="logo text-6xl ">
-              <a href="/">Code-In</a>
-            </div>
-            <div className="nav-links flex items-center gap-13 text-2xl ">
-              <a
-                href="#features-section"
-                className=" hover:bg-gradient-to-b from-[faf0e6] to-[#f0d5b2] p-3 rounded-2xl"
-              >
-                Features
-              </a>
-              <a
-                href="/docs"
-                className=" hover:bg-gradient-to-b from-[faf0e6] to-[#f0d5b2] p-3 rounded-2xl"
-              >
-                Docs
-              </a>
-              <a
-                href="#pricing-section"
-                className=" hover:bg-gradient-to-b from-[faf0e6] to-[#f0d5b2] p-3 rounded-2xl"
-              >
-                Pricing
-              </a>
-              <p
-                ref={dropdownRef2}
-                className=" hover:bg-gradient-to-b from-[faf0e6] to-[#f0d5b2] p-3 rounded-2xl"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setToggle((prev) => !prev);
-                }}
-                onMouseEnter={() => setToggle(true)}
-              >
-                About
-              </p>
-            </div>
-          </div>
-          {toggle && (
-            <div
-              className="absolute mt-2 w-48 bg-[#4b3b42b7] left-190 top-20  shadow-lg z-10  p-2 rounded-2xl"
-              ref={dropdownRef}
-            >
-              <ul className="py-2 text-sm text-black">
-                <li className=" hover:bg-gray-100 cursor-pointer rounded-xl ">
-                  <a
-                    href="#about-section"
-                    className="block w-full h-full px-4 py-2  "
-                  >
-                    About Us
-                  </a>
-                </li>
-                <li className=" hover:bg-gray-100 cursor-pointer rounded-xl">
-                  <a
-                    href="#team-section"
-                    className="block w-full h-full px-4 py-2  "
-                  >
-                    Our Team
-                  </a>
-                </li>
-                <li className=" hover:bg-gray-100 cursor-pointer rounded-xl">
-                  <a
-                    href="#contact"
-                    className="block w-full h-full px-4 py-2  "
-                  >
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-          )}
-          <div className="nav-right-side mr-30 text-2xl">
-            <div className="auth-links">
-              <button
-                onClick={handleGetStarted}
-                className="border-2 p-2 border-black text-gray-300 rounded-2xl bg-black  "
-              >
-                Get started
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="hero-section  flex  gap-10" id="hero-section">
-          <div className="hero-sectoin-elements w-1/2 flex flex-col gap-4 p-10">
-            <div className="hero-text-h1 text-6xl mt-30 ">
+      <div className="main-container px-4 md:px-6 overflow-hidden">
+        <NavBar />
+
+        {/* HERO SECTION */}
+        <div
+          className="hero-section flex flex-col-reverse md:flex-row gap-10 items-center mt-10 md:mt-20"
+          id="hero-section"
+        >
+          <div className="hero-sectoin-elements w-full md:w-1/2 flex flex-col gap-4 md:p-10 text-center md:text-left items-center md:items-start">
+            <h1 className="hero-text-h1 text-3xl sm:text-4xl md:text-6xl font-bold leading-tight">
               Collaborate
               <br />
               Code Ideas Together!
-            </div>
-            <div className="hero-text-h2 text-xl">
-              Whiteboard lets you and your team <br />
-              brainstorm, code, sketch,and create in realtime <br />
-            </div>
-            <div className="hero-button ">
-              <button
-                className=" bg-black text-white p-2 rounded-xl cursor-pointer shadow-md shadow-yellow-100"
-                onClick={handleGetStarted}
-              >
-                Get started
-              </button>
-            </div>
+            </h1>
+            <p className="hero-text-h2 text-base sm:text-lg md:text-xl text-gray-700">
+              Whiteboard lets you and your team brainstorm, code, sketch, and
+              create in real time.
+            </p>
+            <button
+              className="bg-black text-white px-6 py-2 rounded-xl cursor-pointer shadow-md mt-4"
+              onClick={handleGetStarted}
+            >
+              Get started
+            </button>
           </div>
-          <div className="hero-section-image  w-1/2">
-            <img src={HeroImage} alt="" />
+          <div className="hero-section-image w-full md:w-1/2 flex justify-center">
+            <img src={HeroImage} alt="Hero" className="w-full max-w-md" />
           </div>
         </div>
+
+        {/* USE CASE SECTION */}
         <div
-          className="usecase-section  mt-50 flex flex-col items-center gap-2.5"
+          className="usecase-section mt-20 flex flex-col items-center"
           id="usecase-section"
         >
           <UseCasesSlider sliderItems={UseCaseData} />
         </div>
-        <div className="features-section mt-37 " id="features-section">
+
+        {/* FEATURES SECTION */}
+        <div className="features-section mt-20" id="features-section">
           <FeaturesSection sliderItems={FeatureData} />
         </div>
 
+        {/* PRICING SECTION */}
         <div
-          className="pricing-section flex flex-col items-center gap-5  mt-20"
+          className="pricing-section flex flex-col items-center mt-20"
           id="pricing-section"
         >
-          <p className="text-6xl flex justify-center items-center p-5">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-center p-5">
             Pricing Plans
-          </p>
+          </h2>
           <PricingSection sliderItems={PricingData} />
         </div>
 
+        {/* ABOUT SECTION */}
         <div
-          className="about-section mt-20  rounded-2xl px-10 py-2"
+          className="about-section mt-20 px-4 sm:px-6 md:px-10 py-2"
           id="about-section"
         >
           <About />
         </div>
-        <div className="team-section mt-20" id="team-section">
+
+        {/* TEAM SECTION */}
+        <div className="team-section mt-20 px-4" id="team-section">
           <Team />
         </div>
-        <div className="footer">
+
+        {/* FOOTER */}
+        <div className="footer mt-10">
           <Footer />
         </div>
       </div>

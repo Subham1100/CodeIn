@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 
 interface SliderItem {
   title: string;
@@ -15,30 +15,31 @@ interface UseCasesSliderProps {
 
 const UseCasesSlider: React.FC<UseCasesSliderProps> = ({ sliderItems }) => {
   const [option, setOption] = useState(0);
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setOption((prev) => (prev === 3 ? 0 : prev + 1));
+      setOption((prev) => (prev === sliderItems.length - 1 ? 0 : prev + 1));
     }, 3000);
-
     return () => clearInterval(interval);
-  }, []);
+  }, [sliderItems.length]);
 
   return (
     <div className="slider-content flex flex-col gap-6 p-4 w-full h-full rounded-2xl items-center justify-center">
       <div className="flex flex-col items-center rounded-3xl">
         <h1
-          className="flex justify-center font-bold text-6xl mb-10 transition-all"
+          className="flex justify-center font-bold text-3xl md:text-6xl mb-10 transition-all text-center"
           style={{ color: sliderItems[option].title_color }}
         >
           <span className="typing-text">{sliderItems[option].title}</span>
         </h1>
-        <div className="flex  items-center justify-center gap-10">
+
+        <div className="flex md:flex-row flex-col items-center justify-center gap-10">
           <img
             src={sliderItems[option].image_src}
-            className="w-150 h-100  rounded-2xl"
+            className="md:w-150 md:h-100 w-72 h-60 rounded-2xl"
             alt="slider visual"
           />
-          <h2 className="flex justify-center text-center w-100 h-100 shadow-lg items-center  rounded-2xl tracking-wider text-2xl text-black p-4">
+          <h2 className="md:w-100 md:h-100 w-72 h-60 shadow-lg flex justify-center text-center items-center rounded-2xl tracking-wider text-2xl text-black p-4">
             {sliderItems[option].description}
           </h2>
         </div>
