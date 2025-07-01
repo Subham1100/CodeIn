@@ -5,7 +5,7 @@ import FeaturesSection from "../components/featureSection";
 import PricingSection from "../components/pricingSection";
 import About from "../components/about";
 import Team from "../components/team";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Footer from "../components/footer";
 import HeroImage from "/images/Code_typing_cuate.svg";
 
@@ -140,19 +140,10 @@ const HomePage = () => {
     },
   ];
 
-  const sections = [
-    { id: "hero-section", color: "#faf0e6", label: "Section 1" },
-    { id: "usecase-section", color: "#fff0db", label: "Section 2" },
-    { id: "features-section", color: "#eed9c4", label: "Section 3" },
-    { id: "pricing-section", color: "#e4d5b7", label: "Section 4" },
-    { id: "about-section", color: "#C3B8AF", label: "Section 5" },
-    { id: "team-section", color: "#faf0e6", label: "Section 6" },
-  ];
-
   return (
     <div>
       <div className="main-container p-6 ">
-        <div className="fixed inset-0  bg-black text-white flex items-center justify-center text-center px-4 md:hidden  ">
+        <div className="fixed inset-0  bg-black text-white flex items-center justify-center text-center px-4 md:hidden  z-90">
           <p className="text-lg font-semibold">
             Currently not available for mobile screen
           </p>

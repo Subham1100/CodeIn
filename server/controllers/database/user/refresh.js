@@ -10,7 +10,6 @@ export default async function handleRefresh(req, res) {
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
-    console.log("not");
     return res.status(401).json({ message: "Refresh token missing" });
   }
 

@@ -35,5 +35,8 @@
     "socket.io": "^4.8.1",
     "winston": "^3.17.0",
     "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "autocannon": "^8.0.0"
   }
 }

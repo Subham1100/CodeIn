@@ -19,7 +19,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({ sliderItems }) => {
       <p className="feature-section  text-7xl flex  justify-center items-center p-7">
         Features
       </p>
-      <div className="features flex  gap-20 p-10 overflow-scroll h-[500px]">
+      <div className="features flex  gap-20 p-10 overflow-scroll h-[500px] scroll">
         {sliderItems.map((feature, idx) => (
           <div
             key={idx}
