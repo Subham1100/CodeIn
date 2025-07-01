@@ -122,22 +122,43 @@ const NavBar = () => {
           <a
             href="#features-section"
             onClick={() => setIsMobileMenuOpen(false)}
+            className="hover:bg-[#f5f0e1] px-2 py-1 rounded transition-colors duration-200"
           >
             Features
           </a>
-          <a href="/docs" onClick={() => setIsMobileMenuOpen(false)}>
+          <a
+            href="/docs"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="hover:bg-[#f5f0e1] px-2 py-1 rounded transition-colors duration-200"
+          >
             Docs
           </a>
-          <a href="#pricing-section" onClick={() => setIsMobileMenuOpen(false)}>
+          <a
+            href="#pricing-section"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="hover:bg-[#f5f0e1] px-2 py-1 rounded transition-colors duration-200"
+          >
             Pricing
           </a>
-          <a href="#about-section" onClick={() => setIsMobileMenuOpen(false)}>
+          <a
+            href="#about-section"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="hover:bg-[#f5f0e1] px-2 py-1 rounded transition-colors duration-200"
+          >
             About Us
           </a>
-          <a href="#team-section" onClick={() => setIsMobileMenuOpen(false)}>
+          <a
+            href="#team-section"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="hover:bg-[#f5f0e1] px-2 py-1 rounded transition-colors duration-200"
+          >
             Our Team
           </a>
-          <a href="#contact" onClick={() => setIsMobileMenuOpen(false)}>
+          <a
+            href="#contact"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="hover:bg-[#f5f0e1] px-2 py-1 rounded transition-colors duration-200"
+          >
             Contact
           </a>
           <button
@@ -145,7 +166,7 @@ const NavBar = () => {
               setIsMobileMenuOpen(false);
               handleGetStarted();
             }}
-            className="mt-2 border-2 p-2 border-black text-gray-300 rounded-2xl bg-black"
+            className="mt-2 border-2 p-2 border-black text-gray-300 rounded-2xl bg-black hover:bg-[#f5f0e1] hover:text-black transition-all duration-200"
           >
             Get started
           </button>
